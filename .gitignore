@@ -1,6 +1,5 @@
 # venv
 env_pleiade
 
-# test file 
-test.py
-
+# test files
+backend/tests/
