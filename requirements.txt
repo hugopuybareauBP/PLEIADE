@@ -1,0 +1,13 @@
+# FastAPI
+fastapi
+python-multipart
+
+# Uvicorn
+uvicorn
+unidecode
+
+# Basic DS 
+pandas
+spacy
+numpy
+scikit-learn
