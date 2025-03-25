@@ -58,30 +58,9 @@ def basic_clean(text: str) -> str:
     return text
 
 
-# def split_into_chapters(text: str):
-#     """
-#     Function to split a text into chapters. Ignore TOC by searching for "Chapter <number>" or roman numerals.
-#     """
-#     chapter_pattern = re.compile(r"(Chapter\s+\d+|Chapter\s+[IVXLCDM]+)", re.IGNORECASE)
-#     matches = list(chapter_pattern.finditer(text))
+# def split_into_chapters(text: str, fallback_chunk_size: int = 1000) -> List[str]:
+#     # Content table detection
 
-#     if not matches:
-#         # If there are no recognized chapters, return the entire text as a single chunk
-#         print("[INFO] No chapter headings found in text. Returning full text.")
-#         return ["Full Book"], [text]
-
-#     chapters = []
-#     chapter_texts = []
-
-#     for i, match in enumerate(matches):
-#         start = match.start()
-#         end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
-#         chapter_title = match.group().strip()
-
-#         chapters.append(chapter_title)
-#         chapter_texts.append(text[start:end].strip())
-
-#     return chapters, chapter_texts
 
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...)):

@@ -2,4 +2,4 @@
 env_pleiade
 
 # test files
-backend/tests/
+backend/test/
