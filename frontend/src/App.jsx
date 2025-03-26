@@ -1,8 +1,8 @@
 import React from "react";
-import UploadPage from "./UploadPage.jsx";
+import MainPage from "./MainPage.jsx";
 
 function App() {
-  return <UploadPage />;
+  return <MainPage/>;
 }
 
 export default App;

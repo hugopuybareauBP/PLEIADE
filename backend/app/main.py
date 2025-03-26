@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # from backend.app.routers import summary, profile, spacy_stats, sentiment
-from backend.app.routers import upload, spacy_stats
+from backend.app.routers import upload, summary
 
 print(f"[DEBUG] {spacy_stats}")
 
@@ -33,7 +33,7 @@ app.add_middleware(
 )
 
 app.include_router(upload.router)
-app.include_router(spacy_stats.router)
+app.include_router(summary.router)
 
 if __name__ == "__main__":
     uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)

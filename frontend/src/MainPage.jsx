@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "./UploadPage.css";
+import "./MainPage.css";
 
-export default function UploadPage() {
+export default function MainPage() {
     const [file, setFile] = useState(null);
     const [uploadStatus, setUploadStatus] = useState("");
     const [isDragOver, setIsDragOver] = useState(false);
@@ -131,13 +131,6 @@ export default function UploadPage() {
                     </table>
                 </div>
             )}
-
-            {/* {result && (
-                <div className="result">
-                    <h3>📊 Result:</h3>
-                    <pre>{JSON.stringify(result, null, 2)}</pre>
-                </div>
-            )} */}
             </div>
             </div>
         </div>
