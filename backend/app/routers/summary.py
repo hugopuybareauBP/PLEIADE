@@ -33,9 +33,9 @@ def summarize_all_chunks(manuscript_obj: dict) -> dict:
 
     summarized_chunks = []
 
-    for chunk_dict in manuscript_obj["chunk_list"]:
+    for chunk_dict in manuscript_obj["chunks"]:
         chunk_id = chunk_dict["chunk_id"]
-        chunk_text = chunk_dict[f"chunk_text"]
+        chunk_text = chunk_dict["chunk_text"]
         print(f"[INFO] Summarizing chunk {chunk_id}...")
         summary = summarize_chunk_with_mistral(chunk_text, chunk_id)
         summarized_chunks.append(summary)
