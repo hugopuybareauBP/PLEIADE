@@ -1,0 +1,47 @@
+.stream-wrapper {
+     margin-top: 10px;
+     font-family: "Courier New", Courier, monospace;
+     background-color: #1e1e1e;
+     color: #f8f8f2;
+     padding: 1rem;
+     border-radius: 8px;
+     white-space: pre-wrap;
+     position: relative;
+}
+   
+.stream-text {
+     font-size: 1rem;
+}
+   
+.cursor {
+     display: inline-block;
+     width: 1px;
+     background-color: #f8f8f2;
+     animation: blink 1s steps(2, start) infinite;
+     margin-left: 1px;
+}
+   
+@keyframes blink {
+     to {
+          visibility: hidden;
+     }
+}
+   
+.spinner {
+     border: 3px solid #f3f3f3;
+     border-top: 3px solid #00bcd4;
+     border-radius: 50%;
+     width: 20px;
+     height: 20px;
+     animation: spin 0.6s linear infinite;
+     position: absolute;
+     top: -30px;
+     left: 0;
+}
+   
+@keyframes spin {
+     to {
+       transform: rotate(360deg);
+     }
+}
+   

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import "./MainPage.css";
+import "./SummaryStream.jsx";
 
 export default function MainPage() {
     const [file, setFile] = useState(null);
     const [uploadStatus, setUploadStatus] = useState("");
     const [isDragOver, setIsDragOver] = useState(false);
-    const [textData, setTextData] = useState({ full_text: "", filename: "" });
+    const [textData, setTextData] = useState({ full_text: "", filename: "", chunks: []});
     const [result, setResult] = useState(null);
 
     function handleDragOver(e) {
@@ -62,8 +63,11 @@ export default function MainPage() {
         }
 
     try {
-        // const url = `http://localhost:8000/${endpoint}`;
-        const url = `http://localhost:8000/spacy-stats`;
+        const url = `http://localhost:8000/${endpoint}`;
+        console.log(`[DEBUG] Sending POST request to: ${url}`);
+
+        console.log(`Payload to backend : `, textData)
+
         const response = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -82,6 +86,7 @@ export default function MainPage() {
 
     return (
         <div className="App">
+            <div className="bearing-point">BearingPoint</div>
             <h1 className="app-title">Pleiade</h1>
             <div className="container-boarder">
             <div className="container">
@@ -106,7 +111,7 @@ export default function MainPage() {
                 <h3>Choose Analysis:</h3>
                 <button onClick={() => handleAnalysis("spacy-stats")}>🔍 Spacy Stats</button>{" "}
                 <button onClick={() => handleAnalysis("sentiment")}>😊 Sentiment Analysis</button>{" "}
-                <button onClick={() => handleAnalysis("summary")}>📝 Summarize</button>
+                <button onClick={() => handleAnalysis("summarize")}>📝 Summarize</button>
             </div>
             )}
 
@@ -129,6 +134,18 @@ export default function MainPage() {
                             ))}
                         </tbody>
                     </table>
+                </div>
+            )}
+
+            {result && result.summaries && (
+                <div className="stats-container">
+                <h2>📝 Summaries for: <code>{result.filename}</code></h2>
+                {result.summaries.map((chunk) => (
+                    <div key={chunk.chunk_id} style={{ marginBottom: "20px" }}>
+                        <h4>Chunk {chunk.chunk_id}</h4>
+                        <SummaryStream text={chunk.summary} />
+                    </div>
+                ))}
                 </div>
             )}
             </div>
