@@ -13,34 +13,31 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 def remove_gutenberg_boilerplate(text: str) -> str:
-        """
-        Function to remove Gutenberg header/footer from text.
-        """
-        logger.info("[remove_gutenberg_boilerplate] Removing header/footer from text.")
+    logger.info("[remove_gutenberg_boilerplate] Attempting to remove Gutenberg boilerplate.")
 
-        start_marker = "*** START OF THE PROJECT GUTENBERG EBOOK"
-        end_marker = "*** END OF THE PROJECT GUTENBERG EBOOK"
+    start_marker = "*** START OF THE PROJECT GUTENBERG EBOOK"
+    end_marker = "*** END OF THE PROJECT GUTENBERG EBOOK"
 
-        # Find the start marker
-        start_index = text.find(start_marker)
-        if start_index == -1:
-            logger.error("Start marker not found.")
-            raise ValueError("Start marker not found in text")
+    # Find start
+    start_index = text.find(start_marker)
+    if start_index != -1:
         start_index = text.find("\n", start_index)
-        if start_index == -1:
-            logger.error("Newline after start marker not found.")
-            raise ValueError("Newline after start marker not found in text")
-        text = text[start_index:].strip()
+        if start_index != -1:
+            text = text[start_index:].strip()
+        else:
+            logger.warning("Newline after start marker not found. Returning full text.")
+    else:
+        logger.warning("Start marker not found. Returning full text.")
 
-        # Find the end marker
-        end_index = text.find(end_marker)
-        if end_index == -1:
-            logger.error("End marker not found.")
-            raise ValueError("End marker not found in text")
+    # Find end
+    end_index = text.find(end_marker)
+    if end_index != -1:
         text = text[:end_index].strip()
+    else:
+        logger.warning("End marker not found. Returning full text.")
 
-        logger.info("[remove_gutenberg_boilerplate] Boilerplate removed successfully.")
-        return text
+    logger.info("[remove_gutenberg_boilerplate] Processing complete.")
+    return text
 
 
 def basic_clean(text: str) -> str:
@@ -92,14 +89,14 @@ def split_into_chapters(text: str, fallback_chunk_size: int = 1000) -> List[str]
             chunks.append(text[start:end].strip())
         return chunks
 
-        # split into fixed-length chunks
-        print("No structure found — fallback to chunking.")
-        words = text.split()
-        chunks = []
-        for i in range(0, len(words), fallback_chunk_size):
-            chunk = ' '.join(words[i:i+fallback_chunk_size])
-            chunks.append(chunk)
-        return chunks
+    # split into fixed-length chunks
+    print("No structure found — fallback to chunking.")
+    words = text.split()
+    chunks = []
+    for i in range(0, len(words), fallback_chunk_size):
+        chunk = ' '.join(words[i:i+fallback_chunk_size])
+        chunks.append(chunk)
+    return chunks
 
 
 @router.post("/upload")
@@ -121,7 +118,7 @@ async def upload_file(file: UploadFile = File(...)):
             return {
                 "filename": file.filename,
                 "full_text": cleaned_text,
-                "chunk": [
+                "chunks": [
                     {
                         "chunk_id": i,
                         f"chunk_text": chunks[i]
@@ -130,9 +127,6 @@ async def upload_file(file: UploadFile = File(...)):
                 ]
             }
 
-        except ValueError as ve:
-            logger.error(f"[upload_file] ValueError: {str(ve)}")
-            raise HTTPException(status_code=400, detail=str(ve))
         except Exception as e:
             logger.exception(f"[upload_file] Unexpected error: {str(e)}")
             raise HTTPException(status_code=500, detail=str(e))
