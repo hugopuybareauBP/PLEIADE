@@ -6,10 +6,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# from backend.app.routers import summary, profile, spacy_stats, sentiment
 from backend.app.routers import upload, summary
-
-print(f"[DEBUG] {spacy_stats}")
 
 app = FastAPI(
     title="My Book Analyzer",
