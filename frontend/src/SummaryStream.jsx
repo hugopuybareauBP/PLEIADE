@@ -6,29 +6,35 @@ export default function SummaryStream({ text }) {
      const [isTyping, setIsTyping] = useState(true);
 
      useEffect(() => {
-          if (!text) return;
-
           let index = 0;
+
           const interval = setInterval(() => {
-               if (index < text.length) {
-                    setDisplayedText(prev => prev + text[index]);
-                    index++;
-               } else {
+               setDisplayedText(prev => prev + text[index]);
+               index++;
+
+               if (index >= text.length) {
                     clearInterval(interval);
                     setIsTyping(false);
-                    }
-          }, 20); 
+               } 
+          }, 50); 
 
      return () => clearInterval(interval);
      }, [text]);
 
+     // return (
+     //      <div className="stream-wrapper">
+     //           {isTyping && <div className="spinner"></div>}
+     //           <pre className="stream-text">
+     //                {displayedText}
+     //                {isTyping && <span className="cursor">|</span>}
+     //           </pre>
+     //      </div>
+     // );
+
      return (
           <div className="stream-wrapper">
-               {isTyping && <div className="spinner"></div>}
-               <pre className="stream-text">
-                    {displayedText}
-                    {isTyping && <span className="cursor">|</span>}
-               </pre>
+               {displayedText}
+               {isTyping && <span className="cursor">|</span>}
           </div>
      );
 }
