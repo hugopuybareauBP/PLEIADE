@@ -2,8 +2,6 @@ from vllm import LLM
 from transformers import AutoTokenizer
 from huggingface_hub import login
 
-login("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")
-
 MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.3"
 llm = LLM(model=MODEL_NAME, device="cpu")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
