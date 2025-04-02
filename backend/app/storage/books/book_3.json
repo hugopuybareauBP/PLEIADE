@@ -1,0 +1,172 @@
+{
+    "overview": {
+        "synopsis": "Emma Davis's 'The Art of Code' reveals the beauty and creativity behind software development. This groundbreaking work demonstrates how coding is not just a technical skill but a form of artistic expression, blending logical thinking with creative problem-solving.",
+        "keyData": {
+            "estimatedReadingTime": "6 hours 45 minutes",
+            "wordCount": "72,000 words",
+            "pages": "260 pages",
+            "chapters": "9 chapters",
+            "mainCharacters": "8 developer profiles",
+            "keyLocations": "Tech labs and creative spaces"
+        },
+        "contentAnalysis": {
+            "timePeriod": "Modern software era",
+            "genres": "Technology, Creativity, Software Engineering",
+            "tone": "Elegant, Insightful, Personal",
+            "keywords": [
+                "Software Development",
+                "Creativity",
+                "Code as Art",
+                "Problem Solving",
+                "Design Patterns",
+                "Innovation",
+                "Engineering Mindset"
+            ]
+        },
+        "classification": {
+            "primaryThema": "UBG (Programming and scripting languages)",
+            "secondaryThema": [
+                {
+                    "code": "AB",
+                    "label": "Creative expression"
+                },
+                {
+                    "code": "TBD",
+                    "label": "Computer programming"
+                }
+            ],
+            "qualifiers": [
+                "4K (Creative interest)",
+                "4G (Research and development)"
+            ]
+        }
+    },
+    "analysis": {
+        "impact": {
+            "strengths": [
+                "Original perspective blending creativity with programming",
+                "Effective use of real-world developer profiles",
+                "Encourages a cultural shift in how code is perceived",
+                "Well-structured and thought-provoking",
+                "Highlights the elegance and aesthetics of clean code"
+            ],
+            "weaknesses": [
+                "Some case studies may feel too niche",
+                "Lacks diversity in programming languages covered",
+                "Could expand on historical evolution of programming",
+                "Light on interactive or hands-on examples",
+                "Occasional jargon may deter non-coders"
+            ]
+        },
+        "characters": [
+            {
+                "group": "Creative Developers",
+                "description": "Profiles of coders who treat programming as artistic practice."
+            },
+            {
+                "group": "Educators",
+                "description": "Those reshaping how we teach programming creatively."
+            },
+            {
+                "group": "Design Thinkers",
+                "description": "Experts blending UX design with engineering principles."
+            }
+        ],
+        "chapters": [
+            {
+                "title": "Code as Language",
+                "summary": "Framing programming as a powerful form of communication."
+            },
+            {
+                "title": "Beauty in Logic",
+                "summary": "Exploring symmetry, structure, and creativity in algorithms."
+            },
+            {
+                "title": "The Developer’s Canvas",
+                "summary": "Examples of codebases treated like artwork."
+            },
+            {
+                "title": "Programming Mindset",
+                "summary": "Discusses how logic and creativity can coexist."
+            }
+        ]
+    },
+    "marketing": {
+        "ecommerce": {
+            "title": "Coding as Creative Expression",
+            "description": [
+                "In 'The Art of Code,' Emma Davis presents programming not as a mechanical task, but as a true form of artistry. Through real-life stories and elegant logic, she reframes how we think about development.",
+                "\"Finally, a book that shows the poetry in programming.\" – DevCulture Weekly",
+                "You'll discover:"
+            ],
+            "bullets": [
+                "How top developers approach code as design",
+                "Examples of beautiful, elegant code from real-world projects",
+                "The philosophy behind clean and expressive logic",
+                "How creativity and logic coexist in software",
+                "Tips for cultivating a creative mindset in tech"
+            ],
+            "closing": "'The Art of Code' is for developers, designers, and anyone who believes software can be beautiful."
+        },
+        "social": {
+            "twitter": [
+                {
+                    "content": "✨ 'The Art of Code' proves that programming is a form of creativity. A must-read for every dev. #CodeIsArt #DevReads",
+                    "metrics": {
+                        "likes": 237,
+                        "retweets": 61
+                    }
+                },
+                {
+                    "content": "💻 Emma Davis reframes how we see code. Less syntax, more soul. #TheArtOfCode #TechPhilosophy",
+                    "metrics": {
+                        "likes": 192,
+                        "retweets": 45
+                    }
+                }
+            ],
+            "instagram": [
+                {
+                    "image": "https://images.unsplash.com/photo-1537432376769-00c5b1ee78b8?w=800&auto=format&fit=crop&q=60",
+                    "caption": "🔧🧠 'The Art of Code' is a journey into the creative side of programming. #CodeDesign #CreativeDevelopers",
+                    "metrics": {
+                        "likes": 587,
+                        "comments": 28
+                    }
+                },
+                {
+                    "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60",
+                    "caption": "💡Code is your canvas. 'The Art of Code' shows you how to paint. #ProgrammingInspiration",
+                    "metrics": {
+                        "likes": 715,
+                        "comments": 39
+                    }
+                }
+            ],
+            "tiktok": [
+                {
+                    "thumbnail": "https://images.unsplash.com/photo-1611042553484-2fdceff30724?w=800&auto=format&fit=crop&q=60",
+                    "caption": "When your code compiles *and* looks clean ✨ #DevTok #CodeSatisfying",
+                    "metrics": {
+                        "views": "103.9K",
+                        "likes": "14.7K"
+                    }
+                },
+                {
+                    "thumbnail": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=60",
+                    "caption": "'The Art of Code' makes you fall in love with functions again. #CleanCode #BookTok",
+                    "metrics": {
+                        "views": "157.2K",
+                        "likes": "19.6K"
+                    }
+                }
+            ]
+        },
+        "visuals": [
+            "code_beauty_1.jpg",
+            "creative_dev_2.jpg",
+            "logic_art_3.jpg",
+            "dev_mindset_4.jpg"
+        ]
+    }
+}

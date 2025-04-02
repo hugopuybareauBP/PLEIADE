@@ -1,0 +1,173 @@
+{
+    "overview": {
+        "synopsis": "A revolutionary guide to the world of quantum computing, Robert Zhang's book demystifies complex concepts for both technical and non-technical readers. From quantum mechanics principles to practical applications, this book charts the future of computing technology.",
+        "keyData": {
+            "estimatedReadingTime": "9 hours 15 minutes",
+            "wordCount": "95,000 words",
+            "pages": "340 pages",
+            "chapters": "14 chapters",
+            "mainCharacters": "10 pioneering scientists",
+            "keyLocations": "Global quantum research centers"
+        },
+        "contentAnalysis": {
+            "timePeriod": "Quantum era and near future",
+            "genres": "Science, Technology, Computing",
+            "tone": "Educational, Futuristic, Clear",
+            "keywords": [
+                "Quantum Mechanics",
+                "Computing",
+                "Algorithms",
+                "Quantum Physics",
+                "Future of Tech",
+                "Encryption",
+                "Information Theory",
+                "AI & Quantum"
+            ]
+        },
+        "classification": {
+            "primaryThema": "TBC (Computer science)",
+            "secondaryThema": [
+                {
+                    "code": "PHQ",
+                    "label": "Quantum physics"
+                },
+                {
+                    "code": "UB",
+                    "label": "Technology innovation"
+                }
+            ],
+            "qualifiers": [
+                "4G (Research & development)",
+                "4T (Technical reference)"
+            ]
+        }
+    },
+    "analysis": {
+        "impact": {
+            "strengths": [
+                "Thorough explanation of quantum fundamentals",
+                "Bridges gap between theory and real-world application",
+                "Includes voices from major research institutions",
+                "Clearly distinguishes classical vs. quantum paradigms",
+                "Good use of diagrams and simplified analogies"
+            ],
+            "weaknesses": [
+                "Heavy technical sections for non-experts",
+                "Limited discussion of ethical implications",
+                "Assumes some familiarity with physics concepts",
+                "Could include more future scenario projections",
+                "Chapter flow sometimes jumps between levels of depth"
+            ]
+        },
+        "characters": [
+            {
+                "group": "Quantum Theorists",
+                "description": "Laying the mathematical foundation for quantum computing."
+            },
+            {
+                "group": "Industry Leaders",
+                "description": "Companies and teams working on real-world quantum chips."
+            },
+            {
+                "group": "Policy Thinkers",
+                "description": "Experts forecasting regulatory and economic impact."
+            }
+        ],
+        "chapters": [
+            {
+                "title": "Quantum Basics",
+                "summary": "Introduces qubits, superposition, and entanglement."
+            },
+            {
+                "title": "Building a Quantum Machine",
+                "summary": "Overview of hardware challenges and innovations."
+            },
+            {
+                "title": "Quantum Algorithms",
+                "summary": "Explores Shor’s and Grover’s algorithms in context."
+            },
+            {
+                "title": "Future of Computation",
+                "summary": "Long-term outlook on quantum vs classical systems."
+            }
+        ]
+    },
+    "marketing": {
+        "ecommerce": {
+            "title": "The Future of Computing Starts Here",
+            "description": [
+                "'Quantum Computing' by Robert Zhang is your guide to the next technological leap. With clarity and depth, it unpacks the mechanics, challenges, and vast potential of quantum systems.",
+                "\"A crucial read for anyone curious about what's next in tech.\" – FutureTech Review",
+                "You'll discover:"
+            ],
+            "bullets": [
+                "How quantum computers work and why they matter",
+                "Key breakthroughs and current players in the field",
+                "What industries quantum tech will disrupt",
+                "The role of ethics and regulation in quantum",
+                "What it means for AI, security, and data"
+            ],
+            "closing": "Engineers, investors, futurists — this is your quantum primer. Don't miss it."
+        },
+        "social": {
+            "twitter": [
+                {
+                    "content": "🧠 What’s harder than rocket science? Quantum computing. This book makes it click. #QuantumTech #NextGenComputing",
+                    "metrics": {
+                        "likes": 199,
+                        "retweets": 55
+                    }
+                },
+                {
+                    "content": "💻 Robert Zhang just made quantum accessible. Yes, seriously. #QuantumExplained #BookTok",
+                    "metrics": {
+                        "likes": 248,
+                        "retweets": 62
+                    }
+                }
+            ],
+            "instagram": [
+                {
+                    "image": "https://images.unsplash.com/photo-1573497491208-6b1acb260507?w=800&auto=format&fit=crop&q=60",
+                    "caption": "⚛️ Quantum logic, made visual. Dive into the computing revolution. #QuantumReads #TechFuture",
+                    "metrics": {
+                        "likes": 784,
+                        "comments": 51
+                    }
+                },
+                {
+                    "image": "https://images.unsplash.com/photo-1611042553484-2fdceff30724?w=800&auto=format&fit=crop&q=60",
+                    "caption": "📚 From superposition to disruption: understand the world of qubits. #QuantumComputing #FutureTech",
+                    "metrics": {
+                        "likes": 891,
+                        "comments": 67
+                    }
+                }
+            ],
+            "tiktok": [
+                {
+                    "thumbnail": "https://images.unsplash.com/photo-1607201410945-8d8b5c32cf1b?w=800&auto=format&fit=crop&q=60",
+                    "caption": "Quantum computing explained in 30 seconds 🤯 #TechTok #QuantumQuick",
+                    "metrics": {
+                        "views": "189.2K",
+                        "likes": "23.4K"
+                    }
+                },
+                {
+                    "thumbnail": "https://images.unsplash.com/photo-1614352641467-0c601f709df4?w=800&auto=format&fit=crop&q=60",
+                    "caption": "Should you be scared of quantum AI? #DeepTech #QuantumThought",
+                    "metrics": {
+                        "views": "211.9K",
+                        "likes": "28.1K"
+                    }
+                }
+            ]
+        },
+        "visuals": [
+            "quantum_grid_1.jpg",
+            "chip_closeup_2.jpg",
+            "future_circuit_3.jpg",
+            "ai_qc_combo_4.jpg"
+        ]
+    }
+}

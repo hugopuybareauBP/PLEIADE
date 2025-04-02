@@ -1,0 +1,173 @@
+{
+    "overview": {
+        "synopsis": "Lisa Anderson delves into the science of creativity and innovation in 'The Creative Mind.' Through neuroscience research and practical exercises, she reveals how we can unlock our creative potential and adapt to an increasingly complex world.",
+        "keyData": {
+            "estimatedReadingTime": "6 hours 20 minutes",
+            "wordCount": "68,000 words",
+            "pages": "250 pages",
+            "chapters": "11 chapters",
+            "mainCharacters": "7 featured case studies",
+            "keyLocations": "Creative labs, innovation centers"
+        },
+        "contentAnalysis": {
+            "timePeriod": "Contemporary",
+            "genres": "Neuroscience, Creativity, Personal Development",
+            "tone": "Empowering, Practical, Thoughtful",
+            "keywords": [
+                "Creativity",
+                "Neuroscience",
+                "Innovation",
+                "Brain Science",
+                "Problem Solving",
+                "Mindset",
+                "Growth",
+                "Flow State"
+            ]
+        },
+        "classification": {
+            "primaryThema": "JMA (Psychology)",
+            "secondaryThema": [
+                {
+                    "code": "VSP",
+                    "label": "Personal development and practical psychology"
+                },
+                {
+                    "code": "KJ",
+                    "label": "Creativity in business"
+                }
+            ],
+            "qualifiers": [
+                "4K (Creative interest)",
+                "4P (Popular science)"
+            ]
+        }
+    },
+    "analysis": {
+        "impact": {
+            "strengths": [
+                "Blends neuroscience with actionable insights",
+                "Motivational tone that empowers the reader",
+                "Backed by academic research but stays accessible",
+                "Includes practical frameworks for creative thinking",
+                "Engages both individual readers and teams"
+            ],
+            "weaknesses": [
+                "Some examples feel overly anecdotal",
+                "Doesn't deeply explore cross-cultural creativity differences",
+                "Could offer more group-based exercises",
+                "Pacing slows down in middle chapters",
+                "Repeats certain themes across chapters"
+            ]
+        },
+        "characters": [
+            {
+                "group": "Neuroscientists",
+                "description": "Experts who explore the brain's creative functions."
+            },
+            {
+                "group": "Innovators",
+                "description": "Real-world figures pushing boundaries in their field."
+            },
+            {
+                "group": "Educators & Coaches",
+                "description": "Helping others cultivate creativity."
+            }
+        ],
+        "chapters": [
+            {
+                "title": "Unlocking the Brain",
+                "summary": "Foundations of how the brain generates creative thought."
+            },
+            {
+                "title": "Creative Triggers",
+                "summary": "External and internal factors that spark ideas."
+            },
+            {
+                "title": "From Ideas to Impact",
+                "summary": "Translating inspiration into concrete results."
+            },
+            {
+                "title": "Lifelong Creativity",
+                "summary": "Maintaining creative momentum and evolving over time."
+            }
+        ]
+    },
+    "marketing": {
+        "ecommerce": {
+            "title": "Unlock the Power of Your Mind",
+            "description": [
+                "'The Creative Mind' by Lisa Anderson dives into the neuroscience of innovation. Through stories, science, and exercises, you'll learn how to awaken your imagination.",
+                "\"A practical, science-backed guide to tapping into your creative core.\" – Brainpower Monthly",
+                "You'll discover:"
+            ],
+            "bullets": [
+                "How creativity forms in the brain",
+                "Habits to enhance ideation and problem-solving",
+                "The role of emotion and environment",
+                "Daily practices to unlock innovation",
+                "How to stay creative over a lifetime"
+            ],
+            "closing": "This book belongs on the shelf of every thinker, artist, entrepreneur, and innovator looking to harness the full power of their mind."
+        },
+        "social": {
+            "twitter": [
+                {
+                    "content": "🧠 You don’t need to be a genius — you need this book. 'The Creative Mind' by Lisa Anderson rewires your brain for innovation. #ThinkDifferent #CreativityUnlocked",
+                    "metrics": {
+                        "likes": 263,
+                        "retweets": 74
+                    }
+                },
+                {
+                    "content": "🌀 How to build creative habits that last a lifetime? Start with 'The Creative Mind'. #NeuroCreativity #BookTok",
+                    "metrics": {
+                        "likes": 305,
+                        "retweets": 88
+                    }
+                }
+            ],
+            "instagram": [
+                {
+                    "image": "https://images.unsplash.com/photo-1606312616521-f31ee3d42ecb?w=800&auto=format&fit=crop&q=60",
+                    "caption": "🌱 'The Creative Mind' is your personal toolkit for lifelong innovation. #CreativeMindset #NeuroHacks",
+                    "metrics": {
+                        "likes": 948,
+                        "comments": 56
+                    }
+                },
+                {
+                    "image": "https://images.unsplash.com/photo-1609457443117-b99cf8f3a289?w=800&auto=format&fit=crop&q=60",
+                    "caption": "🔓 Creativity isn’t magic. It’s science — and this book proves it. #UnlockYourMind",
+                    "metrics": {
+                        "likes": 1134,
+                        "comments": 78
+                    }
+                }
+            ],
+            "tiktok": [
+                {
+                    "thumbnail": "https://images.unsplash.com/photo-1611042553484-2fdceff30724?w=800&auto=format&fit=crop&q=60",
+                    "caption": "POV: You just rewired your brain for creativity 🔥 #BookTok #BrainBoost",
+                    "metrics": {
+                        "views": "172.6K",
+                        "likes": "21.7K"
+                    }
+                },
+                {
+                    "thumbnail": "https://images.unsplash.com/photo-1624377211650-f95d68f45ac4?w=800&auto=format&fit=crop&q=60",
+                    "caption": "This book turned my creative rut into a breakthrough 💥 #NeuroReads",
+                    "metrics": {
+                        "views": "198.3K",
+                        "likes": "25.1K"
+                    }
+                }
+            ]
+        },
+        "visuals": [
+            "neuro_creativity_1.jpg",
+            "mind_expansion_2.jpg",
+            "habit_loops_3.jpg",
+            "creative_sparks_4.jpg"
+        ]
+    }
+}

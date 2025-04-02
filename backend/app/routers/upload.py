@@ -3,14 +3,13 @@
 import re
 import logging
 import datetime
+import secrets
 
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from typing import List
 from unidecode import unidecode
-from uuid import uuid4
 
-from backend.app.storage.storage import save_book
-from backend.app.storage.storage import load_books
+from backend.app.storage.storage import save_book, load_books, save_book_details
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -44,7 +43,6 @@ def remove_gutenberg_boilerplate(text: str) -> str:
     logger.info("[remove_gutenberg_boilerplate] Processing complete.")
     return text
 
-
 def basic_clean(text: str) -> str:
 
         logger.info("[basic_clean] Starting basic cleaning of text.")
@@ -58,7 +56,6 @@ def basic_clean(text: str) -> str:
 
         logger.info("[basic_clean] Basic cleaning complete.")
         return text
-
 
 def split_into_chapters(text: str, fallback_chunk_size: int = 1000) -> List[str]:
 
@@ -127,7 +124,7 @@ async def upload_file(file: UploadFile = File(...)):
             logger.exception(f"[upload_file] Unexpected error: {str(e)}")
             raise HTTPException(status_code=500, detail=str(e))
         
-        book_id = str(uuid4())
+        book_id = secrets.token_hex(4)
         book_data = {
             "id": book_id,
             "title": file.filename.replace(".txt", ""),
@@ -148,7 +145,39 @@ async def upload_file(file: UploadFile = File(...)):
         save_book(book_data)
         logger.info(f"[upload_file] Book data saved with ID: {book_id}")
 
-        return {
-            "message": "Book uploaded successfully",
-            "book_id": book_id
-        }
+        default_details = {
+            "overview": {
+                "synopsis": "",
+                "keyData": {
+                    "estimatedReadingTime": "",
+                    "wordCount": "",
+                    "pages": "",
+                    "chapters": "",
+                    "mainCharacters": "",
+                    "keyLocations": ""
+                },
+                "contentAnalysis": {
+                    "timePeriod": "",
+                    "genres": "",
+                    "tone": "",
+                    "keywords": []
+                },
+                "classification": {
+                    "primaryThema": "",
+                    "secondaryThema": [
+                        {
+                            "code": "",
+                            "label": ""
+                        }
+                    ],
+                    "qualifiers": []
+                }
+            }
+        }   
+
+        save_book_details(book_id, default_details)
+
+        logger.info(f"[upload_file] Book data + empty details saved with ID: {book_id}")
+
+        return {"id": book_id}
+
