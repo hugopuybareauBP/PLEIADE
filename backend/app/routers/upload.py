@@ -2,10 +2,15 @@
 
 import re
 import logging
+import datetime
 
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from typing import List
 from unidecode import unidecode
+from uuid import uuid4
+
+from backend.app.storage.storage import save_book
+from backend.app.storage.storage import load_books
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -98,6 +103,10 @@ def split_into_chapters(text: str, fallback_chunk_size: int = 1000) -> List[str]
         chunks.append(chunk)
     return chunks
 
+@router.get("/books")
+def get_books():
+    logger.info("[get_books] Fetching all books.")
+    return load_books()
 
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
@@ -114,19 +123,32 @@ async def upload_file(file: UploadFile = File(...)):
 
             logger.info(f"[upload_file] File '{file.filename}' processed successfully.")
 
-
-            return {
-                "filename": file.filename,
-                "full_text": cleaned_text,
-                "chunks": [
-                    {
-                        "chunk_id": i,
-                        f"chunk_text": chunks[i]
-                    }
-                    for i in range(len(chunks))
-                ]
-            }
-
         except Exception as e:
             logger.exception(f"[upload_file] Unexpected error: {str(e)}")
             raise HTTPException(status_code=500, detail=str(e))
+        
+        book_id = str(uuid4())
+        book_data = {
+            "id": book_id,
+            "title": file.filename.replace(".txt", ""),
+            "cover": "",
+            "author": "",
+            "uploadDate": datetime.datetime.now().isoformat(),
+            "progress": 50,
+            "synopsis": "synopsis",
+            "full_text": cleaned_text,
+            "chunks": [
+                {
+                    "chunk_id": i,
+                    "chunk_text": chunks[i]
+                }
+                for i in range(len(chunks))
+            ]
+        }
+        save_book(book_data)
+        logger.info(f"[upload_file] Book data saved with ID: {book_id}")
+
+        return {
+            "message": "Book uploaded successfully",
+            "book_id": book_id
+        }
