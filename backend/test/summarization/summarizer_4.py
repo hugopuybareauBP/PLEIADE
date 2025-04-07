@@ -1,91 +1,12 @@
+# backend/test/summarization/summarizer_4.py
+
 import time
-from ollama import chat
-import re 
-from typing import List
-from rich.console import Console
-from rich.panel import Panel
-from rich.progress import Progress
 import os
 import json
-import time
 
-import nltk
-from nltk.corpus import stopwords
+from ollama import chat
 
-with open("backend/test/data/alice_in_wonderland.txt", "r") as file:
-    dummy_text = file.read()
-
-nltk.download('stopwords')
-
-stop_words = set(stopwords.words('english'))
-
-link_words = {
-    "and", "also", "in addition", "additionally", "furthermore", # addition
-    "moreover", "as well", "besides", "too", "not only that"
-    "but", "however", "although", "even though", "though", "yet", # contrast
-    "nevertheless", "nonetheless", "on the other hand", "despite",
-    "in contrast", "still", "whereas", "while", "instead", "conversely"
-    "because", "since", "as", "due to", "therefore", "thus", # cause n effect
-    "hence", "consequently", "so", "for this reason", "as a result"
-    "similarly", "likewise", "just as", "in the same way", "equally" # comparison
-    "indeed", "in fact", "certainly", "undoubtedly", "above all", # emphasis
-    "clearly", "obviously", "of course", "surely"
-    "for example", "for instance", "such as", "including", "namely", # illustration
-    "to illustrate", "in particular", "especially"
-    "first", "second", "third", "then", "next", "after", "afterward", # time sequence
-    "before", "eventually", "finally", "meanwhile", "subsequently",
-    "at the same time", "now", "later", "soon", "until", "when", "while"
-    "in conclusion", "to summarize", "to sum up", "overall", "in brief", # summary
-    "in short", "on the whole", "in a nutshell", "ultimately"
-    "if", "unless", "provided that", "as long as", "even if", "in case" # condition
-    "so that", "in order that", "to", "so", "for the purpose of" # purpose
-}
-
-
-def filter_text(text: str) -> str:
-    words = re.findall(r'\b\w+\b', text.lower())
-
-    filtered_words = [
-        word for word in words
-        if word not in stop_words and word not in link_words
-    ]
-
-    return ' '.join(filtered_words)
-
-# Chunking
-def split_into_chapters(text: str, fallback_chunk_size: int = 1000) -> List[str]:
-
-    # Content table detection 
-    ct_pattern = re.compile(r"(table of contents|contents|toc)([\s\S]{0,10000})", re.IGNORECASE) # if i dont put the a limit, it will grab full book
-    ct_match = re.search(ct_pattern, text)
-        
-    if ct_match: # found one
-        print(f"CT detected")
-        ct_block = ct_match.group(2)
-        chapter_lines = re.findall(r'(chapter\s+(?:\d+|[ivxlc]+).*?)\n', ct_block, re.IGNORECASE)
-
-        if chapter_lines:
-            last_heading = chapter_lines[-1]
-            heading_pattern = re.escape(last_heading.strip())
-            last_heading_match = list(re.finditer(heading_pattern, text, re.IGNORECASE))
-
-            if last_heading_match:
-                ct_end = last_heading_match[0].end()
-               #  print(f"Removed {text[:ct_end]}")
-                text = text[ct_end:]
-                    
-    # Look for chapter in the text
-    chapter_pattern = r'(chapter\s+(?:\d+|[ivxlc]+))\b' # strict so it doesnt match 'in this chapter ...' 
-    chapter_matches = list(re.finditer(chapter_pattern, text, re.IGNORECASE))
-
-    if len(chapter_matches) >= 2:
-        print(f"{len(chapter_matches)} chapters detected via headings.")
-        chunks = []
-        for i in range(len(chapter_matches)):
-            start = chapter_matches[i].start()
-            end = chapter_matches[i + 1].start() if i + 1 < len(chapter_matches) else len(text)
-            chunks.append(text[start:end].strip())
-        return chunks
+from backend.test.preprocessing.preprocessing_6 import preprocessing_pipeline
 
 def summarize_chunk_with_mistral(chunk_text: str, chunk_id: int) -> dict:
     
@@ -122,29 +43,27 @@ def summarize_all_chunks(chunks) -> dict:
 
 
 if __name__ == "__main__":
-    start_total = time.time()
+    file_path = "backend/test/data/echoes.txt"
+    with open(file_path, 'r') as f:
+        dummy_text = f.read()
 
-    print(f"Cleaning the text of any stop/link words...")
-    dummy_text = filter_text(dummy_text)
+    for i in range(5):
+        start_total = time.time()
+        chunks = preprocessing_pipeline(dummy_text)
+        # print(f"[PREPROCESSING] Preprocessing completed in {time.time() - start_total:.2f} seconds.")
 
-    print(f"📚 Splitting book into chapters...")
-    chunks = split_into_chapters(dummy_text)
+        start_summarization = time.time()
+        result = summarize_all_chunks(chunks)
 
-    print(f"✅ {len(chunks)} chunks created. Starting summarization...\n")
+        print(f"\n⚡ Summarization completed in {time.time() - start_summarization:.2f} seconds.")
 
-    start_summarization = time.time()
-    result = summarize_all_chunks(chunks)
-    end_summarization = time.time()
+    # for chapter, summary in enumerate(result["summary"]):
+    #     print(f"=== CHAPTER {chapter} ===")
+    #     print(summary)
 
-    print(f"\n⚡ Summarization completed in {end_summarization - start_summarization:.2f} seconds.")
-
-    for chapter, summary in enumerate(result["summary"]):
-        print(f"=== CHAPTER {chapter} ===")
-        print(summary)
-
-    filename = f"backend/test/summarization/summaries/echoes_4.json"
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-    with open(filename, "w") as f:
-        json.dump(result, f, indent=4)
-    print(f"✅ Summaries saved to {filename}.\n")
+    # filename = f"backend/test/summarization/summaries/echoes_3.json"
+    # os.makedirs(os.path.dirname(filename), exist_ok=True)
+    # with open(filename, "w") as f:
+    #     json.dump(result, f, indent=4)
+    # print(f"✅ Summaries saved to {filename}.\n")
 

@@ -13,13 +13,8 @@ from typing import List
 from unidecode import unidecode
 
 from backend.app.storage.storage import save_book, load_books, save_book_details
-from backend.app.utils.preprocessing import (
-    remove_gutenberg_boilerplate,
-    basic_clean,
-    get_token_count,
-    remove_toc_using_chapter_density,
-    split_into_chapters
-)
+from backend.app.utils.preprocessing import preprocessing_pipeline
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -39,9 +34,7 @@ async def upload_file(file: UploadFile = File(...)):
             content = await file.read()
             text = content.decode("utf-8", errors="replace")
 
-            cleaned_text = remove_gutenberg_boilerplate(text)
-            cleaned_text = basic_clean(cleaned_text)
-            chunks = split_into_chapters(cleaned_text)
+            chunks = preprocessing_pipeline(text)
 
             logger.info(f"[upload_file] File '{file.filename}' processed successfully.")
 

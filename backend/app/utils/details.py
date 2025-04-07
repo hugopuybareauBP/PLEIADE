@@ -1,9 +1,9 @@
-# backend/app/generation/details.py
+# backend/app/utils/details.py
 
 import random as rd
 
-from backend.app.generation.llm import build_chapter_breakdown, build_synopsis
-from backend.app.generation.llm import build_ecommerce_desc, build_tweet
+from backend.app.utils.llm import build_chapter_breakdown, build_synopsis
+from backend.app.utils.llm import build_ecommerce_desc, build_tweet
 from backend.app.storage.storage import load_book_chunks, load_book_details
 
 def generate_analysis_components(book_id):
