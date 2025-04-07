@@ -29,9 +29,9 @@ const MarketingTab: React.FC<Props> = ({ bookId }) => {
     useEffect(() => {
         const fetchMarketing = async () => {
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/books/${bookId}/analysis_marketing`);
-                const json = await res.json();
-                setData(json.marketing);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/books/${bookId}/details`);
+                const details = await res.json();
+                setData(details.marketing);
             } catch (err) {
                 console.error("Failed to load marketing data", err);
             } finally {

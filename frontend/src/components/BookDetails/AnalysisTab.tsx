@@ -1,26 +1,25 @@
-// frontend/src/components/BookDetails/AnalysisTab.tsx
-
 import React, { useEffect, useState } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 
 interface Chapter {
     title: string;
     summary: string;
-  }
-  
-  interface Character {
+}
+
+interface Character {
     group: string;
     description: string;
-  }
-  
-  interface AnalysisData {
+}
+
+interface AnalysisData {
+    synopsis: string;
     impact: {
-      strengths: string[];
-      weaknesses: string[];
+        strengths: string[];
+        weaknesses: string[];
     };
     characters: Character[];
     chapters: Chapter[];
-  }
+}
 
 interface Props {
     bookId: string;
@@ -32,25 +31,39 @@ const AnalysisTab: React.FC<Props> = ({ bookId }) => {
 
     useEffect(() => {
         const fetchAnalysis = async () => {
+            setLoading(true);
+
             try {
-                const res = await fetch(`${import.meta.env.VITE_API_URL}/books/${bookId}/analysis_marketing`);
-                const json = await res.json();
-                setData(json.analysis);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/books/${bookId}/details`);
+                const details = await res.json();
+                setData(details.analysis);
             } catch (err) {
                 console.error("Failed to load analysis", err);
             } finally {
-                setLoading(false);
+                setTimeout(() => setLoading(false), 300);
             }
         };
+
         fetchAnalysis();
     }, [bookId]);
 
     if (loading || !data) {
-        return <p className="text-white">Generating analysis...</p>;
+        return (
+            <div className="text-white">
+                <p>Generating analysis...</p>
+            </div>
+        );
     }
 
     return (
         <div className="space-y-6">
+            {data.synopsis && (
+                <div className="bg-white/5 rounded-lg p-6 mb-6">
+                    <h3 className="text-xl font-semibold mb-4">Synopsis</h3>
+                    <p className="text-white/70">{data.synopsis}</p>
+                </div>
+            )}
+
             <div className="bg-white/5 rounded-lg p-6">
                 <h3 className="text-xl font-semibold mb-4">Impact Analysis</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -83,7 +96,6 @@ const AnalysisTab: React.FC<Props> = ({ bookId }) => {
                 <h3 className="text-xl font-semibold mb-4">Chapter Breakdown</h3>
                 <ul className="space-y-3">
                     {data.chapters.map((chapter, index) => (
-                        console.log("CHAPTER", chapter),
                         <div key={index} className="flex items-start space-x-4">
                             <span className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center">
                                 {index + 1}

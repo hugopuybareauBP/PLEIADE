@@ -1,5 +1,4 @@
-import os
-import json
+# backend/app/generation/llm.py
 
 from pathlib import Path
 from ollama import chat
@@ -36,6 +35,7 @@ def build_chapter_breakdown(chunks) -> dict:
     return chapter_breakdown
 
 def build_synopsis(chapter_breakdown) -> str: # First 5 chapters though
+    print(f"[INFO] Building synopsis...")
     context = "\n".join([c["summary"] for c in chapter_breakdown[:5]])
      
     prompt = (
@@ -50,6 +50,43 @@ def build_synopsis(chapter_breakdown) -> str: # First 5 chapters though
         f"- Avoid bullet points and lists\n"
         f"- Be suitable for an e-commerce product page or publisher's back cover\n"
         f"- Do not mention summaries or chapters\n"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["message"]["content"]
+
+def build_ecommerce_desc(synopsis) -> str:
+    prompt = (
+        f"You are a professional copywriter creating an e-commerce book description.\n\n"
+        # f"Book title: '{book_title}'\n\n"
+        f"Here is a short synopsis of the book:\n"
+        f"{synopsis}\n\n"
+        f"Based on this, write a compelling, professional product description including:\n"
+        f"- A strong, attention-grabbing hook\n"
+        f"- A short synopsis based on the summary\n"
+        f"- A few bullet points about what readers will discover or enjoy\n"
+        f"- A closing sentence that encourages the reader to get the book\n\n"
+        f"Make it exciting and accessible, like something on Amazon. Do not mention that this is based on a summary or say that it’s written by an AI."
+    ) 
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["message"]["content"]
+
+def build_tweet(synopsis) -> str:
+    prompt = (
+        f"You are a social media content writer for a publishing house.\n\n"
+        f"Based on the following synopsis, generate a creative tweets that promote the book with the following synopsis.\n\n"
+        f"Synopsis:\n{synopsis}\n\n"
+        f"The tweet should be punchy, engaging, and fit within 280 characters. "
+        f"Use a witty, modern tone. Finish with 3 different hashtags and don't mention AI or that it is based on a summary.\n"
     )
 
     response = chat(

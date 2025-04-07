@@ -8,11 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.routers import upload # UploadPage
 
-from backend.app.routers import overview, analysis_marketing # BookDetailsPage
+from backend.app.routers import book_details # BookDetailsPage
 
 app = FastAPI(
     title="My Book Analyzer",
-    description="A simple API to analyze manuscripts (upload, chapter split, stats, etc.)"
+    description="A simple API to analyze manuscripts (upload, chapter split, stats, etc.)",
+    run="debug"
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -33,8 +34,7 @@ app.add_middleware(
 )
 
 app.include_router(upload.router)
-app.include_router(overview.router)
-app.include_router(analysis_marketing.router)
+app.include_router(book_details.router)
 
 if __name__ == "__main__":
     uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)

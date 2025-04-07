@@ -2,10 +2,12 @@ import json
 import os
 
 from pathlib import Path
+from fastapi import HTTPException
 
 BOOKS_UPLOADPAGE_FILE = Path("backend/app/storage/books_overview.json")
 STORAGE_PATH = Path("backend/app/storage/books")
 
+# UPLOAD PAGE METHODS
 def load_books():
     if BOOKS_UPLOADPAGE_FILE.exists():
         with open(BOOKS_UPLOADPAGE_FILE, "r", encoding="utf-8") as f:
@@ -18,26 +20,30 @@ def save_book(book_data):
     with open(BOOKS_UPLOADPAGE_FILE, "w", encoding="utf-8") as f:
         json.dump(books, f, indent=4)
 
-def save_book_details(book_id: str, new_details: dict): #no override
+# BOOK DETAILS METHODS
+
+def load_book_chunks (book_id: str) -> dict:
+    with open(BOOKS_UPLOADPAGE_FILE, "r", encoding="utf-8") as f:
+        books = json.load(f)
+
+    for book in books:
+        if book["id"] == book_id:
+            return book.get("chunks", [])
+
+    raise ValueError(f"No book found with ID {book_id}")
+    
+def save_book_details(book_id: str, book_data: dict): #override
     path = STORAGE_PATH / f"book_{book_id}.json"
-
-    if path.exists():
-        with open(path, "r", encoding="utf-8") as f:
-            existing_details = json.load(f)
-    else:
-        existing_details = {}
-
-    merged_details = {**existing_details, **new_details}
-
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(merged_details, f, indent=2, ensure_ascii=False)
+        json.dump(book_data, f, indent=4, ensure_ascii=False)
 
 def load_book_details(book_id: str) -> dict:
     path = STORAGE_PATH / f"book_{book_id}.json"
-    if path.exists():
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return {"Nope"}
+    if not path.exists():
+        raise HTTPException(status_code=401, detail="Book details not found")
+    
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
     
 def get_book_path(book_id: str) -> str:
     return os.path.join(STORAGE_PATH, f"book_{book_id}.json")

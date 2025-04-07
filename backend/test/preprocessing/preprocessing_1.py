@@ -55,4 +55,4 @@ def test(file_path):
 		print(chunk)  # print first 1000 chars
 		print("\n...\n")
 
-test("backend/test/romeo_and_juliet.txt")
+test("backend/test/data/alice_in_wonderland.txt")
