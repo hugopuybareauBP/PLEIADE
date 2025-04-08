@@ -1,3 +1,5 @@
+# backend/test/content/synopsis.py
+
 import json
 import time
 import os 
@@ -9,7 +11,7 @@ from rich.panel import Panel
 # Initialize console
 console = Console()
 
-book_title = "Alice in Wonderland"
+# book_title = "Alice in Wonderland"
 
 def generate_synopsis_from_summaries(book_title: str, summaries: str) -> str:
     summary = "\n".join(summaries[:5])
@@ -37,22 +39,21 @@ def generate_synopsis_from_summaries(book_title: str, summaries: str) -> str:
 
 if __name__ == "__main__":
     start = time.time()
-    filepath = "backend/test/summarization/summaries/alice_vivid_prompt_2.json"
+    filepath = "backend/test/summarization/summaries/echoes_3.json"
     with open(filepath, "r", encoding="utf-8") as f:
         data = json.load(f)
     
     summaries = [summary["raw_output"] for summary in data["summary"]]
 
-    console.print(Panel(f"[bold cyan] Generating synopsis : [green]{book_title}[/]"))
-    synospis = generate_synopsis_from_summaries(book_title, summaries)
+    console.print(Panel(f"[bold cyan] Generating synopsis[/]"))
+    synospis = generate_synopsis_from_summaries(summaries)
     synopsis_dict = {
-        "book_title": book_title,
         "synopsis": synospis
     }
     console.print(Panel(f"[bold magenta]Synopsis:\n{synospis}[/]"))
     console.print(Panel(f"[bold green]Tile elapsed : {time.time()-start:.2f} seconds ![/]"))
 
-    dumpname = f"backend/test/content/dumps/synopsis_alice.json"
+    dumpname = f"backend/test/content/dumps/synopsis_echoes.json"
     os.makedirs(os.path.dirname(dumpname), exist_ok=True)
     with open(dumpname, "w") as f:
         json.dump(synopsis_dict, f, indent=4)

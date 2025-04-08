@@ -9,8 +9,6 @@ import tiktoken
 enc = tiktoken.get_encoding("cl100k_base")
 
 from fastapi import APIRouter, File, UploadFile, HTTPException
-from typing import List
-from unidecode import unidecode
 
 from backend.app.storage.storage import save_book, load_books, save_book_details
 from backend.app.utils.preprocessing import preprocessing_pipeline

@@ -43,7 +43,7 @@ def basic_clean(text: str) -> str:
         print(f"[BASIC_CLEAN] Starting basic cleaning of text.")
 
         # Convert non-ASCII characters (accents, special chars) to closest ASCII equivalents
-        text = unidecode(text)
+        text = unidecode.unidecode(text)
 
         text = text.replace("\r\n", "\n")
         text = re.sub(r"\n\s*\n", "\n\n", text)

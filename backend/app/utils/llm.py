@@ -1,5 +1,8 @@
 # backend/app/generation/llm.py
 
+import json
+import re
+
 from pathlib import Path
 from ollama import chat
 
@@ -28,19 +31,72 @@ def build_chapter_breakdown(chunks) -> dict:
     chapter_breakdown = []
 
     for id, chunk in enumerate(chunks):
-        print(f"[INFO] Summarizing chunk {id}...")
+        print(f"[BUILD_CHAPTER_BREAKDOWN] Summarizing chunk {id}...")
         summary = summarize_chunk_with_mistral(chunk, id)
         chapter_breakdown.append(summary)
 
     return chapter_breakdown
 
+def build_impact_analysis(chapter_breakdown) -> str:
+    print(f"[BUILD_IMPACT_ANALYSIS] Building impact analysis...")
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown])
+    
+    # prompt = (
+    #     f"You are a professional book analyst. Based on the chapter summaries below, write a list of strengths and weaknesses "
+    #     f"for this book. Focus on writing style, structure, clarity, examples, and depth of content.\n\n"
+    #     f"Do not reference chapters directly. Instead, extract high-level impressions.\n\n"
+    #     f"Chapter summaries:\n{context}\n\n"
+    #     f"Create two separate lists:\n"
+    #     f"- Strengths (5 items max)\n"
+    #     f"- Weaknesses (5 items max)\n\n"
+    #     "Respond with a JSON object like this: {\"strengths\": [\"...\"], \"weaknesses\": [\"...\"]\n}"
+    # )
+
+    prompt = (
+        f"You are a professional book analyst.\n"
+        f"Based on the chapter summaries below, write a list of 5 strengths and 5 weaknesses for this book.\n"
+        f"Focus on writing style, structure, clarity, examples, and depth of content.\n\n"
+        f"Respond with valid **minified JSON** ONLY. Do not include markdown, no explanations, no labels.\n"
+        "Format:\n{\"strengths\": [\"...\"], \"weaknesses\": [\"...\"]}\n\n"
+        f"Chapter summaries:\n{context}"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    print(f"[BUILD_IMPACT_ANALYSIS] Response: {response['message']['content']}")
+
+    return response["message"]["content"]
+
+def parse_impact_analysis_output(raw_text: str) -> dict:
+    try:
+        return json.loads(raw_text)
+    except json.JSONDecodeError:
+        print("[PARSER] Raw text is not JSON, falling back to text parsing.")
+
+        strengths_match = re.search(r"\*\*Strengths:\*\*(.*?)(\*\*Weaknesses:\*\*|$)", raw_text, re.DOTALL)
+        weaknesses_match = re.search(r"\*\*Weaknesses:\*\*(.*)", raw_text, re.DOTALL)
+
+        strengths_raw = strengths_match.group(1).strip() if strengths_match else ""
+        weaknesses_raw = weaknesses_match.group(1).strip() if weaknesses_match else ""
+
+        strengths = [re.sub(r"^\d+\.\s*", "", line.strip()) for line in strengths_raw.split("\n") if line.strip()]
+        weaknesses = [re.sub(r"^\d+\.\s*", "", line.strip()) for line in weaknesses_raw.split("\n") if line.strip()]
+
+        return {
+            "strengths": strengths,
+            "weaknesses": weaknesses
+        }
+                
+
 def build_synopsis(chapter_breakdown) -> str: # First 5 chapters though
-    print(f"[INFO] Building synopsis...")
+    print(f"[BUILD_SYNOPSIS] Building synopsis...")
     context = "\n".join([c["summary"] for c in chapter_breakdown[:5]])
      
     prompt = (
         f"You are a professional editor writing a short synopsis for a book.\n\n"
-        # f"Book title: '{book_title}'\n\n"
         f"Below are key points and chapter-level summaries extracted from the book:\n\n"
         f"{context}\n\n"
         f"Using this information, write a polished 2–3 sentence synopsis in the style of a book jacket blurb.\n"
@@ -62,7 +118,6 @@ def build_synopsis(chapter_breakdown) -> str: # First 5 chapters though
 def build_ecommerce_desc(synopsis) -> str:
     prompt = (
         f"You are a professional copywriter creating an e-commerce book description.\n\n"
-        # f"Book title: '{book_title}'\n\n"
         f"Here is a short synopsis of the book:\n"
         f"{synopsis}\n\n"
         f"Based on this, write a compelling, professional product description including:\n"
@@ -87,6 +142,28 @@ def build_tweet(synopsis) -> str:
         f"Synopsis:\n{synopsis}\n\n"
         f"The tweet should be punchy, engaging, and fit within 280 characters. "
         f"Use a witty, modern tone. Finish with 3 different hashtags and don't mention AI or that it is based on a summary.\n"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["message"]["content"]
+
+def build_impact_analysis(chapter_breakdown) -> str:
+    print(f"[BUILD_IMPACT_ANALYSIS] Building impact analysis...")
+    context = "\n".join([c["summary"] for c in chapter_breakdown[:5]])
+    
+    prompt = (
+        f"You are a professional book analyst. Based on the chapter summaries below, write a list of strengths and weaknesses "
+        f"for this book. Focus on writing style, structure, clarity, examples, and depth of content.\n\n"
+        f"Do not reference chapters directly. Instead, extract high-level impressions.\n\n"
+        f"Chapter summaries:\n{context}\n\n"
+        f"Return two separate lists:\n"
+        f"- Strengths (5 items max)\n"
+        f"- Weaknesses (5 items max)\n\n"
+        f"Use bullet points and clear, concise language."
     )
 
     response = chat(

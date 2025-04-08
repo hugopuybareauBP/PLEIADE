@@ -23,6 +23,7 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
     useEffect(() => {
         const fetchDetails = async () => {
             try {
+                console.log("Backend URL:", import.meta.env.VITE_API_URL);
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/books/${bookId}/details`);
                 const details = await res.json();
                 setData(details.overview);
@@ -39,9 +40,6 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
     if (loading || !data) {
         return <p className="text-white">Generating overview...</p>;
     }
-
-    // const { overview, analysis } = data;
-    // const { keyData, contentAnalysis, classification } = overview;
 
     return (
         <div className="space-y-6">

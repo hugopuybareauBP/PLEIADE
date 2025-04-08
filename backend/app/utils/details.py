@@ -2,26 +2,27 @@
 
 import random as rd
 
-from backend.app.utils.llm import build_chapter_breakdown, build_synopsis
+from backend.app.utils.llm import build_chapter_breakdown, build_synopsis, build_impact_analysis, parse_impact_analysis_output
 from backend.app.utils.llm import build_ecommerce_desc, build_tweet
 from backend.app.storage.storage import load_book_chunks, load_book_details
 
 def generate_analysis_components(book_id):
+    print(f"[GENERATE_ANALYSIS_COMPONENTS] Generating analysis for book {book_id}...")
     chunks = load_book_chunks(book_id)
     chapter_breakdown = build_chapter_breakdown(chunks)
 
     analysis = {
-            "impact": {
-                "strengths": [],
-                "weaknesses": []
-            },
+            "impact": parse_impact_analysis_output(build_impact_analysis(chapter_breakdown)),
             "characters": [],
             "chapters": chapter_breakdown 
         }
     
+    print(analysis["impact"])
+    
     return analysis
 
 def generate_overview_components(book_id: str) -> dict:
+    print(f"[GENERATE_OVERVIEW_COMPONENTS] Generating overview for book {book_id}...")
     book_data = load_book_details(book_id)
     chapter_breakdown = book_data.get("analysis", {}).get("chapters", "")
     synopsis = build_synopsis(chapter_breakdown)
@@ -68,24 +69,24 @@ def generate_overview_components(book_id: str) -> dict:
     return overview
 
 def generate_marketing_components(book_id):
+    print(f"[GENERATE_MARKETING_COMPONENTS] Generating marketing for book {book_id}...")
     book_data = load_book_details(book_id)
     synopsis = book_data.get("analysis", {}).get("synopsis", "")
-    print(synopsis)
 
     marketing = {
         "ecommerce": {
             "title": "Generated Title Placeholder",
-            "description": build_ecommerce_desc(synopsis),
+            "description": [build_ecommerce_desc(synopsis)],
             "bullets": [],
             "closing": ""
             },
-        "social_media": {
+        "social": {
             "twitter": [
                 {
                     "content" : build_tweet(synopsis),
                     "metrics" : {
-                        "likes": rd.randit(0, 100),
-                        "retweets": rd.randit(0, 100)
+                        "likes": rd.randint(0, 100),
+                        "retweets": rd.randint(0, 100)
                     }
                 }
             ],

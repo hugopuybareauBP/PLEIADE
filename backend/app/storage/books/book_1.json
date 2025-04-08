@@ -1,51 +1,4 @@
 {
-    "overview": {
-        "synopsis": "In 'The Future of AI,' Sarah Johnson presents a comprehensive exploration of artificial intelligence's revolutionary potential. Through expert analysis and real-world examples, she illuminates how AI is transforming industries, reshaping society, and redefining human potential in the digital age.",
-        "keyData": {
-            "estimatedReadingTime": "8 hours 30 minutes",
-            "wordCount": "85,000 words",
-            "pages": "320 pages",
-            "chapters": "12 chapters",
-            "mainCharacters": "15 industry experts",
-            "keyLocations": "8 tech hubs worldwide"
-        },
-        "contentAnalysis": {
-            "timePeriod": "Present day to 2035",
-            "genres": "Technology, Business, Future Studies",
-            "tone": "Informative, Optimistic, Balanced",
-            "keywords": [
-                "Artificial Intelligence",
-                "Machine Learning",
-                "Digital Transformation",
-                "Innovation",
-                "Ethics",
-                "Future of Work",
-                "Technology Impact",
-                "Automation"
-            ]
-        },
-        "classification": {
-            "primaryThema": "UB (Information & communication technology)",
-            "secondaryThema": [
-                {
-                    "code": "UBJ",
-                    "label": "Impact of AI on social connections"
-                },
-                {
-                    "code": "KJM",
-                    "label": "AI in business strategy"
-                },
-                {
-                    "code": "PDR",
-                    "label": "Societal implications"
-                }
-            ],
-            "qualifiers": [
-                "4SP (For professional/vocational reference)",
-                "4G (Research & development)"
-            ]
-        }
-    },
     "analysis": {
         "impact": {
             "strengths": [
@@ -95,6 +48,53 @@
                 "summary": "Chapter summary and key points will be displayed here."
             }
         ]
+    },
+    "overview": {
+        "synopsis": "In 'The Future of AI,' Sarah Johnson presents a comprehensive exploration of artificial intelligence's revolutionary potential. Through expert analysis and real-world examples, she illuminates how AI is transforming industries, reshaping society, and redefining human potential in the digital age.",
+        "keyData": {
+            "estimatedReadingTime": "8 hours 30 minutes",
+            "wordCount": "85,000 words",
+            "pages": "320 pages",
+            "chapters": "12 chapters",
+            "mainCharacters": "15 industry experts",
+            "keyLocations": "8 tech hubs worldwide"
+        },
+        "contentAnalysis": {
+            "timePeriod": "Present day to 2035",
+            "genres": "Technology, Business, Future Studies",
+            "tone": "Informative, Optimistic, Balanced",
+            "keywords": [
+                "Artificial Intelligence",
+                "Machine Learning",
+                "Digital Transformation",
+                "Innovation",
+                "Ethics",
+                "Future of Work",
+                "Technology Impact",
+                "Automation"
+            ]
+        },
+        "classification": {
+            "primaryThema": "UB (Information & communication technology)",
+            "secondaryThema": [
+                {
+                    "code": "UBJ",
+                    "label": "Impact of AI on social connections"
+                },
+                {
+                    "code": "KJM",
+                    "label": "AI in business strategy"
+                },
+                {
+                    "code": "PDR",
+                    "label": "Societal implications"
+                }
+            ],
+            "qualifiers": [
+                "4SP (For professional/vocational reference)",
+                "4G (Research & development)"
+            ]
+        }
     },
     "marketing": {
         "ecommerce": {
