@@ -3,8 +3,9 @@
 import random as rd
 
 from backend.app.utils.llm import build_chapter_breakdown, build_synopsis, build_impact_analysis, parse_impact_analysis_output
-from backend.app.utils.llm import build_ecommerce_desc, build_tweet
-from backend.app.storage.storage import load_book_chunks, load_book_details
+from backend.app.utils.llm import build_ecommerce_description, parse_ecommerce_output, build_tweet
+from backend.app.utils.key_data import build_key_data
+from backend.app.storage.storage import load_book_chunks, load_book_details, load_book_text
 
 def generate_analysis_components(book_id):
     print(f"[GENERATE_ANALYSIS_COMPONENTS] Generating analysis for book {book_id}...")
@@ -26,17 +27,11 @@ def generate_overview_components(book_id: str) -> dict:
     book_data = load_book_details(book_id)
     chapter_breakdown = book_data.get("analysis", {}).get("chapters", "")
     synopsis = build_synopsis(chapter_breakdown)
+    text = load_book_text(book_id)
 
     overview = {
         "synopsis": synopsis,
-        "keyData": {
-            "estimatedReadingTime": "",
-            "wordCount": "",
-            "pages": "",
-            "chapters": f"{len(book_data.get('analysis', {}).get('chapters', []))} chapters",
-            "mainCharacters": "",
-            "keyLocations": ""
-        },
+        "keyData": build_key_data(text, chapter_breakdown),
         "contentAnalysis": {
             "timePeriod": "",
             "genres": "",
@@ -75,10 +70,7 @@ def generate_marketing_components(book_id):
 
     marketing = {
         "ecommerce": {
-            "title": "Generated Title Placeholder",
-            "description": [build_ecommerce_desc(synopsis)],
-            "bullets": [],
-            "closing": ""
+                parse_ecommerce_output(build_ecommerce_description(synopsis))
             },
         "social": {
             "twitter": [

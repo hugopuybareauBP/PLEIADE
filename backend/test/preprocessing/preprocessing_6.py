@@ -24,27 +24,27 @@ nlp = spacy.load("en_core_web_sm")
 
 # stop_words = set(stopwords.words('english'))
 
-# link_words = {
-#     "and", "also", "in addition", "additionally", "furthermore", # addition
-#     "moreover", "as well", "besides", "too", "not only that"
-#     "but", "however", "although", "even though", "though", "yet", # contrast
-#     "nevertheless", "nonetheless", "on the other hand", "despite",
-#     "in contrast", "still", "whereas", "while", "instead", "conversely"
-#     "because", "since", "as", "due to", "therefore", "thus", # cause n effect
-#     "hence", "consequently", "so", "for this reason", "as a result"
-#     "similarly", "likewise", "just as", "in the same way", "equally" # comparison
-#     "indeed", "in fact", "certainly", "undoubtedly", "above all", # emphasis
-#     "clearly", "obviously", "of course", "surely"
-#     "for example", "for instance", "such as", "including", "namely", # illustration
-#     "to illustrate", "in particular", "especially"
-#     "first", "second", "third", "then", "next", "after", "afterward", # time sequence
-#     "before", "eventually", "finally", "meanwhile", "subsequently",
-#     "at the same time", "now", "later", "soon", "until", "when", "while"
-#     "in conclusion", "to summarize", "to sum up", "overall", "in brief", # summary
-#     "in short", "on the whole", "in a nutshell", "ultimately"
-#     "if", "unless", "provided that", "as long as", "even if", "in case" # condition
-#     "so that", "in order that", "to", "so", "for the purpose of" # purpose
-# }
+link_words = {
+    "and", "also", "in addition", "additionally", "furthermore", # addition
+    "moreover", "as well", "besides", "too", "not only that"
+    "but", "however", "although", "even though", "though", "yet", # contrast
+    "nevertheless", "nonetheless", "on the other hand", "despite",
+    "in contrast", "still", "whereas", "while", "instead", "conversely"
+    "because", "since", "as", "due to", "therefore", "thus", # cause n effect
+    "hence", "consequently", "so", "for this reason", "as a result"
+    "similarly", "likewise", "just as", "in the same way", "equally" # comparison
+    "indeed", "in fact", "certainly", "undoubtedly", "above all", # emphasis
+    "clearly", "obviously", "of course", "surely"
+    "for example", "for instance", "such as", "including", "namely", # illustration
+    "to illustrate", "in particular", "especially"
+    "first", "second", "third", "then", "next", "after", "afterward", # time sequence
+    "before", "eventually", "finally", "meanwhile", "subsequently",
+    "at the same time", "now", "later", "soon", "until", "when", "while"
+    "in conclusion", "to summarize", "to sum up", "overall", "in brief", # summary
+    "in short", "on the whole", "in a nutshell", "ultimately"
+    "if", "unless", "provided that", "as long as", "even if", "in case" # condition
+    "so that", "in order that", "to", "so", "for the purpose of" # purpose
+}
 
 enc = tiktoken.get_encoding("cl100k_base")
 

@@ -35,4 +35,4 @@ async def get_book_details(book_id: str):
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Book not found.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"here is an error: {e}")

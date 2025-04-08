@@ -22,13 +22,23 @@ def save_book(book_data):
 
 # BOOK DETAILS METHODS
 
-def load_book_chunks (book_id: str) -> dict:
+def load_book_chunks(book_id: str) -> dict:
     with open(BOOKS_UPLOADPAGE_FILE, "r", encoding="utf-8") as f:
         books = json.load(f)
 
     for book in books:
         if book["id"] == book_id:
             return book.get("chunks", [])
+
+    raise ValueError(f"No book found with ID {book_id}")
+
+def load_book_text(book_id: str) -> dict:
+    with open(BOOKS_UPLOADPAGE_FILE, "r", encoding="utf-8") as f:
+        books = json.load(f)
+
+    for book in books:
+        if book["id"] == book_id:
+            return book.get("text", "")
 
     raise ValueError(f"No book found with ID {book_id}")
     

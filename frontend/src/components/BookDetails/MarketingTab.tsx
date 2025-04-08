@@ -5,7 +5,6 @@ import { Copy, Instagram, Twitter, Video, Image as ImageIcon } from 'lucide-reac
 
 interface MarketingData {
     ecommerce: {
-        title: string;
         description: string[];
         bullets: string[];
         closing: string;
@@ -56,7 +55,6 @@ const MarketingTab: React.FC<Props> = ({ bookId }) => {
                     </button>
                 </div>
                 <div className="space-y-4 text-white/70">
-                    <p className="text-lg font-semibold">{data.ecommerce.title}</p>
                     {data.ecommerce.description.map((line, i) => (
                         <p key={i}>{line}</p>
                     ))}

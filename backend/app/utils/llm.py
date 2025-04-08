@@ -40,17 +40,6 @@ def build_chapter_breakdown(chunks) -> dict:
 def build_impact_analysis(chapter_breakdown) -> str:
     print(f"[BUILD_IMPACT_ANALYSIS] Building impact analysis...")
     context = "\n".join([c["raw_output"] for c in chapter_breakdown])
-    
-    # prompt = (
-    #     f"You are a professional book analyst. Based on the chapter summaries below, write a list of strengths and weaknesses "
-    #     f"for this book. Focus on writing style, structure, clarity, examples, and depth of content.\n\n"
-    #     f"Do not reference chapters directly. Instead, extract high-level impressions.\n\n"
-    #     f"Chapter summaries:\n{context}\n\n"
-    #     f"Create two separate lists:\n"
-    #     f"- Strengths (5 items max)\n"
-    #     f"- Weaknesses (5 items max)\n\n"
-    #     "Respond with a JSON object like this: {\"strengths\": [\"...\"], \"weaknesses\": [\"...\"]\n}"
-    # )
 
     prompt = (
         f"You are a professional book analyst.\n"
@@ -74,7 +63,7 @@ def parse_impact_analysis_output(raw_text: str) -> dict:
     try:
         return json.loads(raw_text)
     except json.JSONDecodeError:
-        print("[PARSER] Raw text is not JSON, falling back to text parsing.")
+        print("[ANALYSIS_PARSER] Raw text is not JSON, falling back to text parsing.")
 
         strengths_match = re.search(r"\*\*Strengths:\*\*(.*?)(\*\*Weaknesses:\*\*|$)", raw_text, re.DOTALL)
         weaknesses_match = re.search(r"\*\*Weaknesses:\*\*(.*)", raw_text, re.DOTALL)
@@ -115,18 +104,19 @@ def build_synopsis(chapter_breakdown) -> str: # First 5 chapters though
 
     return response["message"]["content"]
 
-def build_ecommerce_desc(synopsis) -> str:
+def build_ecommerce_description(synopsis: str) -> str:
     prompt = (
         f"You are a professional copywriter creating an e-commerce book description.\n\n"
         f"Here is a short synopsis of the book:\n"
         f"{synopsis}\n\n"
-        f"Based on this, write a compelling, professional product description including:\n"
-        f"- A strong, attention-grabbing hook\n"
-        f"- A short synopsis based on the summary\n"
-        f"- A few bullet points about what readers will discover or enjoy\n"
-        f"- A closing sentence that encourages the reader to get the book\n\n"
-        f"Make it exciting and accessible, like something on Amazon. Do not mention that this is based on a summary or say that it’s written by an AI."
-    ) 
+        f"Based on this, return a compelling and professional product description as a JSON object with this format:\n"
+        f"{{\n"
+        f"  \"description\": [\"A strong, attention-grabbing hook\", \"Followed by a few short, exciting sentences summarizing the book\"],\n"
+        f"  \"bullets\": [\"Key takeaway 1\", \"Key takeaway 2\", \"Key takeaway 3\"],\n"
+        f"  \"closing\": \"A persuasive sentence encouraging the user to buy the book.\"\n"
+        f"}}\n\n"
+        f"Make it exciting and accessible like something found on Amazon. Do NOT include markdown or explanations outside the JSON."
+    )
 
     response = chat(
         model="mistral",
@@ -134,6 +124,36 @@ def build_ecommerce_desc(synopsis) -> str:
     )
 
     return response["message"]["content"]
+
+def parse_ecommerce_output(raw: str) -> dict:
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        print("[ECOMMERCE_PARSER] Raw text is not JSON, falling back to text parsing.")
+        lines = raw.splitlines()
+        description = []
+        bullets = []
+        closing = ""
+
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            if re.match(r"^[-•]", line): # we look for a bullet point
+                bullets.append(re.sub(r"^[-•]\s*", "", line))
+            else:
+                description.append(line)
+
+        # # Separate closing from description (last 1-2 lines)
+        # if len(description) >= 2:
+        #     closing = description[-1]
+        #     description = description[:-1]
+
+        return {
+            "description": description,
+            "bullets": bullets,
+            "closing": []
+        }
 
 def build_tweet(synopsis) -> str:
     prompt = (

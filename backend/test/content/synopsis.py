@@ -13,7 +13,7 @@ console = Console()
 
 # book_title = "Alice in Wonderland"
 
-def generate_synopsis_from_summaries(book_title: str, summaries: str) -> str:
+def generate_synopsis_from_summaries(summaries: str) -> str:
     summary = "\n".join(summaries[:5])
      
     prompt = (

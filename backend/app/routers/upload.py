@@ -44,6 +44,7 @@ async def upload_file(file: UploadFile = File(...)):
         book_data = {
             "id": book_id,
             "title": file.filename.replace(".txt", ""),
+            "text": text,
             "cover": "",
             "author": "",
             "uploadDate": datetime.datetime.now().isoformat(),
