@@ -65,7 +65,7 @@ const BookDetails = ({ book, onBack }: BookDetailsProps) => {
             <div className="flex flex-col md:flex-row gap-8 mb-8">
                 <div className="w-full md:w-1/3 lg:w-1/4">
                     <img
-                        src={book.cover}
+                        src={book.cover || '/no_cover.png'}
                         alt={book.title}
                         className="w-full rounded-lg shadow-lg"
                     />

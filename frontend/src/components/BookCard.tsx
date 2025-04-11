@@ -1,4 +1,3 @@
-import React from 'react';
 import { Clock, User } from 'lucide-react';
 
 interface BookCardProps {
@@ -21,7 +20,7 @@ const BookCard = ({ book, onClick }: BookCardProps) => {
         >
             <div className="aspect-[3/4] relative">
                 <img
-                src={book.cover}
+                src={book.cover || '/no_cover.png'}
                 alt={book.title}
                 className="w-full h-full object-cover"
             />
