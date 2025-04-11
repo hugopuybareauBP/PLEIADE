@@ -60,10 +60,14 @@ def get_all_character_candidates_from_book(book_chunks: List[str], chunk_group_s
 
 def build_top_characters(unique_candidates: List[str], n: int = 10):
     prompt = (
-        f"Here is a list of characters mentioned in a book:\n"
+        f"You are analyzing a book. Here is a list of character names that were mentioned:\n\n"
         + "\n".join(f"- {name}" for name in unique_candidates)
-        + f"Return a list of {n} characters, aggregate the one that seems to be the same, and remove duplicates."
-        f" ONLY RETURN THE LIST OFT TOP {n}, WITHOUT ANY EXPLANATION.\n\n"
+        + f"\n\nYour task is to:\n"
+        f"- Identify and merge duplicate names (e.g. 'Mad Hatter' and 'The Hatter')\n"
+        f"- Remove generic or repeated entries\n"
+        f"- Select the {n} most important or relevant characters from this list\n"
+        f"- Return **only** a bullet list of exactly {n} cleaned names\n\n"
+        f"Do not include explanations, instance counts, or parentheticals. Just the list.\n"
     )
 
     response = chat(
@@ -75,6 +79,38 @@ def build_top_characters(unique_candidates: List[str], n: int = 10):
 
     return raw_output
 
+def parse_top_characters(raw_output: str) -> List[str]:
+    important_start = re.search(r"(?i)(the\s+10\s+most\s+important.*?)\n", raw_output)
+
+    if important_start:
+        second_list = raw_output[important_start.end():]
+    else:
+        second_list = raw_output
+
+    lines = [
+        re.sub(r"^\d+[\.\)]\s*", "", line.strip("-• \n"))  # remove bullets and numbering
+        for line in second_list.splitlines()
+        if line.strip()
+    ]
+
+    return lines
+
+def generate_character_profile(character_name: str, context: str):
+    prompt = (
+        f"You are a literary analyst. Based on the context provided,"
+        f"write a concise yet rich character profile for **{character_name}**.\n"
+        f"Base your analysis only on the context provided.\n"
+        f"---\n\n"
+        f"{context}\n\n"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["message"]["content"]
+
 if __name__ == "__main__":
     start = time.time()
     filepath = "backend/test/summarization/summaries/alice_vivid_prompt_2.json"
@@ -83,5 +119,6 @@ if __name__ == "__main__":
     
     summaries = [summary["raw_output"] for summary in data["summary"]]
     unique_candidates = get_all_character_candidates_from_book(summaries)
-    print(f"test : {build_top_characters(unique_candidates)}")
+    final_list = parse_top_characters(build_top_characters(unique_candidates))
+    print(f"Final list : {final_list}\n")
     print(f"Tile elapsed : {time.time()-start:.2f} seconds !")
