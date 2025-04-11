@@ -13,7 +13,7 @@ from backend.app.routers import book_details # BookDetailsPage
 app = FastAPI(
     title="My Book Analyzer",
     description="A simple API to analyze manuscripts (upload, chapter split, stats, etc.)",
-    run="debug"
+    debug=True
 )
 
 logging.basicConfig(level=logging.INFO)
