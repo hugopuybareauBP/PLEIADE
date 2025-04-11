@@ -95,6 +95,11 @@ def parse_top_characters(raw_output: str) -> List[str]:
 
     return lines
 
+def extract_relevant_chunks(chunks: list[str], character_name: str, max_chunks: int = 5) -> list[str]:
+    name_lower = character_name.lower()
+    relevant = [chunk for chunk in chunks if name_lower in chunk.lower()]
+    return relevant[:max_chunks]
+
 def generate_character_profile(character_name: str, context: str):
     prompt = (
         f"You are a literary analyst. Based on the context provided,"
@@ -120,5 +125,6 @@ if __name__ == "__main__":
     summaries = [summary["raw_output"] for summary in data["summary"]]
     unique_candidates = get_all_character_candidates_from_book(summaries)
     final_list = parse_top_characters(build_top_characters(unique_candidates))
-    print(f"Final list : {final_list}\n")
+    context = extract_relevant_chunks(summaries, final_list[0], max_chunks=3)
+    print(f"Profile generation test: {generate_character_profile(final_list[0], context)}\n")
     print(f"Tile elapsed : {time.time()-start:.2f} seconds !")
