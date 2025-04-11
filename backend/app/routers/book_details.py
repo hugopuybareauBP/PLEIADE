@@ -1,5 +1,7 @@
 # backend/app/routers/book_details.py
 
+import time
+
 from fastapi import APIRouter, HTTPException
 from backend.app.storage.storage import load_book_details, save_book_details
 from backend.app.utils.details import (
@@ -12,6 +14,7 @@ router = APIRouter()
 
 @router.get("/books/{book_id}/details")
 async def get_book_details(book_id: str):
+    start = time.time()
     try: 
         book_data = load_book_details(book_id)
 
@@ -30,6 +33,7 @@ async def get_book_details(book_id: str):
         print(f"[GET_BOOK_DETAILS] Saving all sections for book {book_id}...")
         save_book_details(book_id, book_data)
 
+        print(f"[GET_BOOK_DETAILS ROOTER] Finished in {time.time() - start:.2f} seconds")
         return book_data
 
     except FileNotFoundError:
