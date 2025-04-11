@@ -40,7 +40,8 @@
                 "4G (Research & development)",
                 "4T (Technical reference)"
             ]
-        }
+        },
+        "comparison" : []
     },
     "analysis": {
         "impact": {

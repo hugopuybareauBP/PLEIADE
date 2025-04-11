@@ -94,7 +94,8 @@
                 "4SP (For professional/vocational reference)",
                 "4G (Research & development)"
             ]
-        }
+        },
+        "comparison" : []
     },
     "marketing": {
         "ecommerce": {
