@@ -41,6 +41,16 @@ def load_book_text(book_id: str) -> dict:
             return book.get("text", "")
 
     raise ValueError(f"No book found with ID {book_id}")
+
+def load_book_title(book_id: str) -> dict:
+    with open(BOOKS_UPLOADPAGE_FILE, "r", encoding="utf-8") as f:
+        books = json.load(f)
+
+    for book in books:
+        if book["id"] == book_id:
+            return book.get("title", "")
+
+    raise ValueError(f"No book found with ID {book_id}")
     
 def save_book_details(book_id: str, book_data: dict): #override
     path = STORAGE_PATH / f"book_{book_id}.json"
