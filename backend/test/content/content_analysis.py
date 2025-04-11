@@ -81,13 +81,9 @@ def build_keywords(synopsis, summaries):
     return response["message"]["content"]
 
 def parse_keywords(raw_output: str):
-    # Split on numbered items using regex like: "1. ", "2. ", etc.
-    items = re.split(r"\n?\s*\d+\.\s*", raw_output.strip())
-    
-    # Remove any empty strings and strip whitespace
-    keywords = [item.strip() for item in items if item.strip()]
-    
-    return keywords
+    # remove numbered list and commas
+    cleaned = re.sub(r"\d+\.\s*", "", raw_output.strip())
+    return [kw.strip().strip(",") for kw in cleaned.split(",") if kw.strip()]
 
 def parse_numbered_line(raw_output: str) -> str:
     match = re.search(r"\d+\.\s*(.*)", raw_output.strip())
@@ -97,11 +93,11 @@ def parse_numbered_line(raw_output: str) -> str:
 
 if __name__ == '__main__':
     start = time.time()
-    with open("backend/test/content/dumps/synopsis_echoes.json", "r") as f:
+    with open("backend/test/content/dumps/synopsis_alice.json", "r") as f:
         data = json.load(f)
     synopsis = data["synopsis"]
 
-    with open("backend/test/summarization/summaries/echoes_3.json", "r") as f:
+    with open("backend/test/summarization/summaries/alice_vivid_prompt_2.json", "r") as f:
             data = json.load(f)
             summaries = [summary["raw_output"] for summary in data["summary"]]
 
@@ -109,15 +105,15 @@ if __name__ == '__main__':
     # print(f"[BUILD_TIME_PERIOD] Time period: {time_period}")
     # print(f"[BUILD_TIME_PERIOD] Tile elapsed : {time.time()-start:.2f} seconds !")
 
-    genres = parse_numbered_line(build_genres(synopsis, summaries))
-    print(f"[BUILD_GENRES] Genres: {genres}")
-    print(f"[BUILD_GENRES] Tile elapsed : {time.time()-start:.2f} seconds !")
+    # genres = parse_numbered_line(build_genres(synopsis, summaries))
+    # print(f"[BUILD_GENRES] Genres: {genres}")
+    # print(f"[BUILD_GENRES] Tile elapsed : {time.time()-start:.2f} seconds !")
 
-    tone = parse_numbered_line(build_tone(synopsis, summaries))
-    print(f"[BUILD_TONE] Tone: {tone}")
-    print(f"[BUILD_TONE] Tile elapsed : {time.time()-start:.2f} seconds !")
+    # tone = parse_numbered_line(build_tone(synopsis, summaries))
+    # print(f"[BUILD_TONE] Tone: {tone}")
+    # print(f"[BUILD_TONE] Tile elapsed : {time.time()-start:.2f} seconds !")
 
-    # keywords = parse_keywords(build_keywords(synopsis, summaries))
-    # print(f"[BUILD_KEYWORDS] Keywords: {keywords}")
-    # print(f"[BUILD_KEYWORDS] Tile elapsed : {time.time()-start:.2f} seconds !")
+    keywords = parse_keywords(build_keywords(synopsis, summaries))
+    print(f"[BUILD_KEYWORDS] Keywords: {keywords}")
+    print(f"[BUILD_KEYWORDS] Tile elapsed : {time.time()-start:.2f} seconds !")
 

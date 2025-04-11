@@ -39,10 +39,9 @@ def parse_ecommerce(raw: str) -> dict:
 # Overview parsers
 
 def parse_keywords(raw_output: str):
-    items = re.split(r"\n?\s*\d+\.\s*", raw_output.strip())
-    keywords = [item.strip() for item in items if item.strip()]
-    
-    return keywords
+    # remove numbered list and commas
+    cleaned = re.sub(r"\d+\.\s*", "", raw_output.strip())
+    return [kw.strip().strip(",") for kw in cleaned.split(",") if kw.strip()]
 
 def parse_numbered_line(raw_output: str) -> str:
     items = re.findall(r"\d+\.\s*([^,\n]+)", raw_output)
