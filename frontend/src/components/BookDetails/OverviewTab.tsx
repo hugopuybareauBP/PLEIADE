@@ -119,6 +119,21 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                     </div>
                 </dl>
             </div>
+
+            {/* Book Comparison */}
+            {data.comparison && data.comparison.length > 0 && (
+                <div className="bg-white/5 rounded-lg p-6">
+                    <h3 className="text-lg font-semibold mb-3">Similar Books</h3>
+                    <ul className="space-y-4">
+                        {data.comparison.map((book: any, idx: number) => (
+                            <li key={idx} className="text-white">
+                                <p className="font-medium">{book.title} <span className="text-white/50">by {book.author}</span></p>
+                                <p className="text-white/70 text-sm mt-1">{book.note}</p>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
     );
 };

@@ -48,6 +48,55 @@ def parse_numbered_line(raw_output: str) -> str:
     cleaned = ", ".join(item.strip() for item in items if item.strip())
     return cleaned
 
+def parse_comparison(raw_output):
+    try:
+        return json.loads(raw_output)
+    except json.JSONDecodeError:
+        results = []
+
+        # Split on entry numbers (1., 2., etc.)
+        entries = re.split(r"\n?\s*\d+\.\s*", raw_output.strip())
+
+        for entry in entries:
+            if not entry.strip():
+                continue
+
+            author, title, note = "", "", ""
+
+            # === CASE 1: Oneliner format ===
+            if "Short Note:" in entry:
+                author_match = re.search(r"Author:\s*(.*?),\s*Title:", entry)
+                title_match = re.search(r"Title:\s*\"?(.*?)\"?,\s*Short Note:", entry)
+                note_match = re.search(r"Short Note:\s*(.*)", entry, re.DOTALL)
+                
+                if author_match and title_match and note_match:
+                    author = author_match.group(1).strip()
+                    title = title_match.group(1).strip().strip('"')
+                    note = note_match.group(1).strip()
+
+            # === CASE 2: Multiline format ===
+            else:
+                lines = entry.strip().splitlines()
+                for line in lines:
+                    if line.strip().lower().startswith("author:"):
+                        author = line.split(":", 1)[1].strip()
+                    elif line.strip().lower().startswith("title:"):
+                        title = line.split(":", 1)[1].strip().strip('"')
+                    elif line.strip().lower().startswith("note:"):
+                        note = line.split(":", 1)[1].strip()
+                    else:
+                        # continuation of the note
+                        note += " " + line.strip()
+
+            if author and title:
+                results.append({
+                    "author": author,
+                    "title": title,
+                    "note": note.strip()
+                })
+
+        return json.dumps(results, indent=4)
+
 # Analysis parsers
 
 def parse_impact_analysis(raw_text: str) -> dict:

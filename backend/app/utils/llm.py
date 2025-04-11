@@ -199,3 +199,20 @@ def build_keywords(synopsis, chapter_breakdown):
     )
 
     return response["message"]["content"]
+
+def build_comparison(synopsis, keywords):
+    prompt = (
+        f"You are a publishing expert.\n"
+        f"Based on the synopsis and the keywords below, suggest 5 books that are similar in content, themes and audience.\n"
+        f"Return the response in JSON format with the following structure:\n"
+        f"[{{\"author\": \"Author Name\", \"title\": \"Book Title\", \"note\": \"Short note about the book\"}}, ...]\n\n"
+        f"Synopsis:\n{synopsis}\n\n"
+        f"Keywords:\n{keywords}\n\n"
+    )
+    
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["message"]["content"]

@@ -3,9 +3,9 @@
 import random as rd
 
 # Overview imports
-from backend.app.utils.llm import build_synopsis, build_time_period, build_genres, build_tone, build_keywords
+from backend.app.utils.llm import build_synopsis, build_time_period, build_genres, build_tone, build_keywords, build_comparison
 from backend.app.utils.key_data import build_key_data
-from backend.app.utils.parsers import parse_keywords, parse_numbered_line
+from backend.app.utils.parsers import parse_keywords, parse_numbered_line, parse_comparison
 # Analysis imports
 from backend.app.utils.llm import build_impact_analysis, build_chapter_breakdown
 from backend.app.utils.parsers import parse_impact_analysis
@@ -38,6 +38,7 @@ def generate_overview_components(book_id: str) -> dict:
     title = load_book_title(book_id)
     synopsis = build_synopsis(chapter_breakdown, title)
     text = load_book_text(book_id)
+    keywords = parse_keywords(build_keywords(synopsis, chapter_breakdown))
 
     overview = {
         "synopsis": synopsis,
@@ -46,7 +47,7 @@ def generate_overview_components(book_id: str) -> dict:
             "timePeriod": build_time_period(synopsis, chapter_breakdown),
             "genres": parse_numbered_line(build_genres(synopsis, chapter_breakdown)),
             "tone": parse_numbered_line(build_tone(synopsis, chapter_breakdown)),
-            "keywords": parse_keywords(build_keywords(synopsis, chapter_breakdown)),
+            "keywords": keywords,
         },
         "classification": {
             "primaryThema": "",
@@ -59,7 +60,8 @@ def generate_overview_components(book_id: str) -> dict:
                 "4SP (For professional/vocational reference)",
                 "4G (Research & development)"
             ]
-        }
+        },
+        "comparison" : parse_comparison(build_comparison(synopsis, keywords))
     }
 
     return overview
