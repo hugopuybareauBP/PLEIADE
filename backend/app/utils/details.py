@@ -14,7 +14,7 @@ from backend.app.utils.llm import build_ecommerce_description, build_tweet
 from backend.app.utils.parsers import parse_ecommerce
 
 # Storage imports
-from backend.app.storage.storage import load_book_chunks, load_book_details, load_book_text
+from backend.app.storage.storage import load_book_chunks, load_book_details, load_book_text, load_book_title
 
 def generate_analysis_components(book_id):
     print(f"[GENERATE_ANALYSIS_COMPONENTS] Generating analysis for book {book_id}...")
@@ -35,7 +35,8 @@ def generate_overview_components(book_id: str) -> dict:
     print(f"[GENERATE_OVERVIEW_COMPONENTS] Generating overview for book {book_id}...")
     book_data = load_book_details(book_id)
     chapter_breakdown = book_data.get("analysis", {}).get("chapters", "")
-    synopsis = build_synopsis(chapter_breakdown)
+    title = load_book_title(book_id)
+    synopsis = build_synopsis(chapter_breakdown, title)
     text = load_book_text(book_id)
 
     overview = {
@@ -67,10 +68,10 @@ def generate_marketing_components(book_id):
     print(f"[GENERATE_MARKETING_COMPONENTS] Generating marketing for book {book_id}...")
     book_data = load_book_details(book_id)
     synopsis = book_data.get("analysis", {}).get("synopsis", "")
-    chapter_breakdown = book_data.get("analysis", {}).get("chapters", "")
+    title = load_book_title(book_id)
 
     marketing = {
-        "ecommerce": parse_ecommerce(build_ecommerce_description(synopsis)),
+        "ecommerce": parse_ecommerce(build_ecommerce_description(synopsis, title)),
         "social": {
             "twitter": [
                 {
