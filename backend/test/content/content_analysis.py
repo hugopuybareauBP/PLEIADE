@@ -1,0 +1,123 @@
+# backend/test/content/content_analysis.py
+
+import json
+import time
+import re
+
+from ollama import chat 
+
+def build_time_period(synopsis, summaries):
+    print(f"[BUILD_TIME_PERIOD] Building time period...")
+    context = "\n".join(summaries[:5])
+
+    prompt = (
+        f"Based on the synopsis and chapters below, identify the time period covered by the book (e.g., 'Present day', '2030-2045', '19th century to now').\n"
+        f"Consider historical events, cultural references, and any other relevant details.\n"
+        f"One sentence is enough.\n\n"
+        f"Synopsis:\n{synopsis}\n\n"
+        f"Chapter summaries:\n{context}"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["message"]["content"]
+
+def build_genres(synopsis, summaries):
+    print(f"[BUILD_GENRES] Building genres...")
+    context = "\n".join(summaries[:5])
+
+    prompt = (
+        f"Based on the synopsis and chapters below, identify the genres of the book (e.g., 'Science Fiction', 'Romance', 'Historical Fiction').\n"
+        f"Consider themes, characters, and any other relevant details.\n"
+        f"**Just give 3 genres, separated by commas. Do not make a sentence or add any words.**\n\n"
+        f"Synopsis:\n{synopsis}\n\n"
+        f"Chapter summaries:\n{context}"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["message"]["content"]
+
+def build_tone(synopsis, summaries):
+    print(f"[BUILD_TONE] Building tone...")
+    context = "\n".join(summaries[:5])
+
+    prompt = (
+        f"Based on the synopsis and chapters below, identify the tone of the book (e.g., 'Serious', 'Humorous', 'Dark').\n"
+        f"Consider writing style, character interactions, and any other relevant details.\n"
+        f"**Just give 3 tones, separated by commas. Do not make a sentence or add any other words/number.**\n\n"
+        f"Synopsis:\n{synopsis}\n\n"
+        f"Chapter summaries:\n{context}"
+    )
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response["message"]["content"]
+
+def build_keywords(synopsis, summaries):
+    print(f"[BUILD_KEYWORDS] Building keywords...")
+    context = "\n".join(summaries[:5])
+
+    prompt = (
+        f"Based on the synopsis and chapters below, identify 8 keywords that best represent the book.\n"
+        f"Consider themes, characters, and any other relevant details.\n"
+        f"**Just give 8 keywords, separated by commas. Do not make a sentence or add any other words/number.**\n\n"
+        f"Synopsis:\n{synopsis}\n\n"
+        f"Chapter summaries:\n{context}"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["message"]["content"]
+
+def parse_keywords(raw_output: str):
+    # Split on numbered items using regex like: "1. ", "2. ", etc.
+    items = re.split(r"\n?\s*\d+\.\s*", raw_output.strip())
+    
+    # Remove any empty strings and strip whitespace
+    keywords = [item.strip() for item in items if item.strip()]
+    
+    return keywords
+
+def parse_numbered_line(raw_output: str) -> str:
+    match = re.search(r"\d+\.\s*(.*)", raw_output.strip())
+    if match:
+        return match.group(1).strip()
+    return raw_output.strip()
+
+if __name__ == '__main__':
+    start = time.time()
+    with open("backend/test/content/dumps/synopsis_echoes.json", "r") as f:
+        data = json.load(f)
+    synopsis = data["synopsis"]
+
+    with open("backend/test/summarization/summaries/echoes_3.json", "r") as f:
+            data = json.load(f)
+            summaries = [summary["raw_output"] for summary in data["summary"]]
+
+    # time_period = build_time_period(synopsis, summaries)
+    # print(f"[BUILD_TIME_PERIOD] Time period: {time_period}")
+    # print(f"[BUILD_TIME_PERIOD] Tile elapsed : {time.time()-start:.2f} seconds !")
+
+    genres = parse_numbered_line(build_genres(synopsis, summaries))
+    print(f"[BUILD_GENRES] Genres: {genres}")
+    print(f"[BUILD_GENRES] Tile elapsed : {time.time()-start:.2f} seconds !")
+
+    tone = parse_numbered_line(build_tone(synopsis, summaries))
+    print(f"[BUILD_TONE] Tone: {tone}")
+    print(f"[BUILD_TONE] Tile elapsed : {time.time()-start:.2f} seconds !")
+
+    # keywords = parse_keywords(build_keywords(synopsis, summaries))
+    # print(f"[BUILD_KEYWORDS] Keywords: {keywords}")
+    # print(f"[BUILD_KEYWORDS] Tile elapsed : {time.time()-start:.2f} seconds !")
+

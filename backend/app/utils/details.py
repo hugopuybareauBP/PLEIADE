@@ -2,9 +2,18 @@
 
 import random as rd
 
-from backend.app.utils.llm import build_chapter_breakdown, build_synopsis, build_impact_analysis, parse_impact_analysis_output
-from backend.app.utils.llm import build_ecommerce_description, parse_ecommerce_output, build_tweet
+# Overview imports
+from backend.app.utils.llm import build_synopsis, build_time_period, build_genres, build_tone, build_keywords
 from backend.app.utils.key_data import build_key_data
+from backend.app.utils.parsers import parse_keywords, parse_numbered_line
+# Analysis imports
+from backend.app.utils.llm import build_impact_analysis, build_chapter_breakdown
+from backend.app.utils.parsers import parse_impact_analysis
+# Marketing imports
+from backend.app.utils.llm import build_ecommerce_description, build_tweet
+from backend.app.utils.parsers import parse_ecommerce
+
+# Storage imports
 from backend.app.storage.storage import load_book_chunks, load_book_details, load_book_text
 
 def generate_analysis_components(book_id):
@@ -13,7 +22,7 @@ def generate_analysis_components(book_id):
     chapter_breakdown = build_chapter_breakdown(chunks)
 
     analysis = {
-            "impact": parse_impact_analysis_output(build_impact_analysis(chapter_breakdown)),
+            "impact": parse_impact_analysis(build_impact_analysis(chapter_breakdown)),
             "characters": [],
             "chapters": chapter_breakdown 
         }
@@ -33,19 +42,10 @@ def generate_overview_components(book_id: str) -> dict:
         "synopsis": synopsis,
         "keyData": build_key_data(text, chapter_breakdown),
         "contentAnalysis": {
-            "timePeriod": "",
-            "genres": "",
-            "tone": "",
-            "keywords": [
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                ""
-            ]
+            "timePeriod": build_time_period(synopsis, chapter_breakdown),
+            "genres": parse_numbered_line(build_genres(synopsis, chapter_breakdown)),
+            "tone": parse_numbered_line(build_tone(synopsis, chapter_breakdown)),
+            "keywords": parse_keywords(build_keywords(synopsis, chapter_breakdown)),
         },
         "classification": {
             "primaryThema": "",
@@ -67,11 +67,10 @@ def generate_marketing_components(book_id):
     print(f"[GENERATE_MARKETING_COMPONENTS] Generating marketing for book {book_id}...")
     book_data = load_book_details(book_id)
     synopsis = book_data.get("analysis", {}).get("synopsis", "")
+    chapter_breakdown = book_data.get("analysis", {}).get("chapters", "")
 
     marketing = {
-        "ecommerce": {
-                parse_ecommerce_output(build_ecommerce_description(synopsis))
-            },
+        "ecommerce": parse_ecommerce(build_ecommerce_description(synopsis)),
         "social": {
             "twitter": [
                 {
@@ -105,6 +104,7 @@ def generate_marketing_components(book_id):
         },
         "visuals": []
     }
+    print(f"[GENERATE_MARKETING_COMPONENTS] Marketing components generated successfully.")
 
     return marketing
 
