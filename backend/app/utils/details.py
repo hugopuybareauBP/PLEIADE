@@ -27,8 +27,6 @@ def generate_analysis_components(book_id):
             "chapters": chapter_breakdown 
         }
     
-    print(analysis["impact"])
-    
     return analysis
 
 def generate_overview_components(book_id: str) -> dict:
