@@ -1,4 +1,4 @@
-# backend/app/generation/preprocessing.py
+# backend/test/proprecessing/preprocessing_6.py
 
 import re 
 import tiktoken
@@ -39,6 +39,7 @@ def remove_gutenberg_boilerplate(text: str) -> str:
     return text
 
 def basic_clean(text: str) -> str:
+
         print(f"[BASIC_CLEAN] Starting basic cleaning of text.")
 
         # Convert non-ASCII characters (accents, special chars) to closest ASCII equivalents
@@ -101,13 +102,16 @@ def split_into_chapters(text: str, fallback_chunk_size: int = 1000) -> List[str]
     return chunks
 
 def compress_text_sumy(text: str, sentence_count: int = 5) -> str:
+
     parser = PlaintextParser.from_string(text, Tokenizer("english"))
     summarizer = LexRankSummarizer()
     summary = summarizer(parser.document, sentence_count)
     return " ".join(str(sentence) for sentence in summary)
 
 def compress_chapter_safe(text: str, min_words: int = 100, threshold_words: int = 500) -> str:
+
     word_count = len(text.split())
+    
     if word_count < threshold_words:
         return text
 

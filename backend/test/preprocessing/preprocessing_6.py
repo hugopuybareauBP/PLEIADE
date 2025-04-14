@@ -162,14 +162,14 @@ def split_into_chapters(text: str, fallback_chunk_size: int = 1000) -> List[str]
 #     cleaned = [s for i, s in enumerate(sentences) if i not in to_remove]
 #     return ' '.join(cleaned)
 
-def compress_text_ner(text: str) -> str:
-    sentences = sent_tokenize(text)
-    informative_sentences = []
+# def compress_text_ner(text: str) -> str:
+#     sentences = sent_tokenize(text)
+#     informative_sentences = []
 
-    for sentence in sentences:
-        doc = nlp(sentence)
-        if any(ent.label_ for ent in doc.ents):  # if there's at least one named entity
-            informative_sentences.append(sentence)
+#     for sentence in sentences:
+#         doc = nlp(sentence)
+#         if any(ent.label_ for ent in doc.ents):  # if there's at least one named entity
+#             informative_sentences.append(sentence)
 
     return " ".join(informative_sentences)
 
@@ -189,14 +189,14 @@ def compress_text_sumy_dynamic(text: str) -> str:
     else:
         return text
     
-def cleaning_ner_then_sumy(text: str, min_words: int = 100) -> str:
-    ner_filtered = compress_text_with_ner(text)
+# def cleaning_ner_then_sumy(text: str, min_words: int = 100) -> str:
+#     ner_filtered = compress_text_with_ner(text)
     
-    # If too short after NER, return original
-    if len(ner_filtered.split()) < min_words:
-        return text
+#     # If too short after NER, return original
+#     if len(ner_filtered.split()) < min_words:
+#         return text
 
-    return compress_text_sumy_dynamic(ner_filtered)
+#     return compress_text_sumy_dynamic(ner_filtered)
 
 
 def preprocessing_pipeline(text: str) -> List[str]:
