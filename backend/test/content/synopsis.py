@@ -32,7 +32,10 @@ def generate_synopsis_from_summaries(summaries: str) -> str:
 
     response = chat(
         model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 1,
+        }
     )
 
     return response["message"]["content"]
@@ -53,7 +56,7 @@ if __name__ == "__main__":
     console.print(Panel(f"[bold magenta]Synopsis:\n{synospis}[/]"))
     console.print(Panel(f"[bold green]Tile elapsed : {time.time()-start:.2f} seconds ![/]"))
 
-    dumpname = f"backend/test/content/dumps/synopsis_echoes.json"
+    dumpname = f"backend/test/content/dumps/synopsis_echoes_2.json"
     os.makedirs(os.path.dirname(dumpname), exist_ok=True)
     with open(dumpname, "w") as f:
         json.dump(synopsis_dict, f, indent=4)
