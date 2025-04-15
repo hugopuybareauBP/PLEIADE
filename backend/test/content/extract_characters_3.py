@@ -3,10 +3,14 @@
 import time
 import json
 import re
+import torch
 
 from ollama import chat
 from typing import List
-from collections import Counter
+from collections import defaultdict
+from sentence_transformers import SentenceTransformer, util
+
+embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def get_character_candidates_from_chunk(text: str) -> List[str]:
     prompt = (
@@ -16,7 +20,13 @@ def get_character_candidates_from_chunk(text: str) -> List[str]:
         f"{text}"
     )
 
-    response = chat(model="mistral", messages=[{"role": "user", "content": prompt}])
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
+    )
 
     raw_output = response["message"]["content"]
 
@@ -63,16 +73,19 @@ def build_top_characters(unique_candidates: List[str], n: int = 10):
         f"You are analyzing a book. Here is a list of character names that were mentioned:\n\n"
         + "\n".join(f"- {name}" for name in unique_candidates)
         + f"\n\nYour task is to:\n"
-        f"- Identify and merge duplicate names (e.g. 'Mad Hatter' and 'The Hatter')\n"
-        f"- Remove generic or repeated entries\n"
-        f"- Select the {n} most important or relevant characters from this list\n"
-        f"- Return **only** a bullet list of exactly {n} cleaned names\n\n"
+        f"- Identify and merge duplicate names (e.g. 'Mad Hatter' and 'The Hatter').\n"
+        f"- Remove generic or repeated entries.\n"
+        f"- Select the most important or relevant characters from this list.\n"
+        f"- Return **only** a bullet list of a maximum of {n} cleaned names\n\n"
         f"Do not include explanations, instance counts, or parentheticals. Just the list.\n"
     )
 
     response = chat(
         model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
     )
 
     raw_output = response["message"]["content"]
@@ -95,36 +108,96 @@ def parse_top_characters(raw_output: str) -> List[str]:
 
     return lines
 
+# naive approach
+# def extract_relevant_chunks(chunks: list[str], character_name: str, max_chunks: int = 5) -> list[str]:
+#     name_lower = character_name.lower()
+#     relevant = [chunk for chunk in chunks if name_lower in chunk.lower()]
+#     return relevant[:max_chunks]
+
+# cosine similarity approach
 def extract_relevant_chunks(chunks: list[str], character_name: str, max_chunks: int = 5) -> list[str]:
-    name_lower = character_name.lower()
-    relevant = [chunk for chunk in chunks if name_lower in chunk.lower()]
-    return relevant[:max_chunks]
+    chunk_embeddings = embedding_model.encode(chunks, convert_to_tensor=True)
+    # query is only character name
+    query_embedding = embedding_model.encode(character_name, convert_to_tensor=True)
+    cosine_scores = util.cos_sim(query_embedding, chunk_embeddings)[0]
+    top_results = torch.topk(cosine_scores, k=min(max_chunks, len(chunks)))
+
+    return [chunks[idx] for idx in top_results.indices]
+
+# faiss approach??
+
+
+# 7B has 8k token context window, protects against overloading
+def truncate_context(chunks: list[str], max_tokens: int = 3000):
+    from transformers import AutoTokenizer
+    tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.1")
+    total_tokens = 0
+    selected_chunks = []
+
+    for chunk in chunks:
+        tokens = len(tokenizer.encode(chunk))
+        if total_tokens + tokens > max_tokens:
+            break
+        selected_chunks.append(chunk)
+        total_tokens += tokens
+
+    return "\n\n".join(selected_chunks)
 
 def generate_character_profile(character_name: str, context: str):
     prompt = (
-        f"You are a literary analyst. Based on the context provided,"
-        f"write a concise yet rich character profile for **{character_name}**.\n"
-        f"Base your analysis only on the context provided.\n"
-        f"---\n\n"
-        f"{context}\n\n"
+        f"You are a literary analyst tasked with writing a factual and concise character profile.\n"
+        f"Return your answer as a JSON list in the following format:\n"
+        f'{{"character": "{character_name}", "description": "<concise profile based only on the context>"}}\n'
+        f"Use **only** the information provided in the context below.\n"
+        f"If the information is vague, keep your answer general and do not invent details.\n"
+        f"---\n"
+        f"{context}\n"
+        f"---\n"
+        f"Now write the character profile as JSON:"
     )
 
     response = chat(
         model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
     )
 
     return response["message"]["content"]
 
+def parse_character_profile(raw_output: str):
+    try:
+        data = json.loads(raw_output)
+        if not isinstance(data, dict):
+            return None
+
+        character = data.get("character", "").strip()
+        description = data.get("description", "").strip()
+
+        if character and description:
+            return {"character": character, "description": description}
+        return None
+
+    except Exception as e:
+        print(f"Parsing failed: {e}")
+        return None
+    
 if __name__ == "__main__":
     start = time.time()
-    filepath = "backend/test/summarization/summaries/alice_vivid_prompt_2.json"
+    filepath = "backend/test/summarization/summaries/echoes_4.json"
     with open(filepath, "r", encoding="utf-8") as f:
         data = json.load(f)
     
     summaries = [summary["raw_output"] for summary in data["summary"]]
     unique_candidates = get_all_character_candidates_from_book(summaries)
     final_list = parse_top_characters(build_top_characters(unique_candidates))
-    context = extract_relevant_chunks(summaries, final_list[0], max_chunks=3)
-    print(f"Profile generation test: {generate_character_profile(final_list[0], context)}\n")
+    print(f"Character candidates: {final_list}\n")
+    
+    for char in final_list[:5] if len(final_list) > 5 else final_list:
+        print(f"Profile generation test for {char}:\n\n")
+        context = truncate_context(extract_relevant_chunks(summaries, char, max_chunks=3))
+        context = context.replace(char, f"**{char}**")
+        # print(f"Context:\n{context}\n")
+        print(f"{generate_character_profile(char, context)}\n")
     print(f"Tile elapsed : {time.time()-start:.2f} seconds !")
