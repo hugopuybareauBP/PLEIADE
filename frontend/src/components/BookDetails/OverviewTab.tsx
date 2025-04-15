@@ -1,32 +1,50 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Clock,
-    FileText,
-    BookOpen,
-    BarChart2,
-    Users,
-    MapPin,
-    Calendar,
-    BookType,
-    MessageCircle,
-    Tag
+    Clock, FileText, BookOpen, BarChart2, Users, MapPin,
+    Calendar, BookType, MessageCircle, Tag
 } from 'lucide-react';
 
 interface OverviewTabProps {
     bookId: string;
 }
 
+type BookWithCover = {
+    title: string;
+    author: string;
+    note: string;
+    coverUrl: string | null;
+};
+
 const OverviewTab = ({ bookId }: OverviewTabProps) => {
     const [data, setData] = useState<any | null>(null);
     const [loading, setLoading] = useState(true);
+    const [similarBooks, setSimilarBooks] = useState<BookWithCover[]>([]);
+    const [selectedCover, setSelectedCover] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchDetails = async () => {
             try {
-                console.log("Backend URL:", import.meta.env.VITE_API_URL);
                 const res = await fetch(`${import.meta.env.VITE_API_URL}/books/${bookId}/details`);
                 const details = await res.json();
                 setData(details.overview);
+
+                if (details.overview?.comparison?.length > 0) {
+                    const enriched = await Promise.all(
+                        details.overview.comparison.map(async (book: any) => {
+                            const query = `intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`;
+                            const url = `https://www.googleapis.com/books/v1/volumes?q=${query}`;
+                            try {
+                                const res = await fetch(url);
+                                const json = await res.json();
+                                const coverUrl = json.items?.[0]?.volumeInfo?.imageLinks?.thumbnail ?? null;
+                                return { ...book, coverUrl };
+                            } catch {
+                                return { ...book, coverUrl: null };
+                            }
+                        })
+                    );
+                    setSimilarBooks(enriched); // ✅ FIX: store in correct state
+                }
             } catch (err) {
                 console.error("Error fetching book details:", err);
             } finally {
@@ -89,7 +107,7 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
             </div>
 
             {/* Classification */}
-            <div className="bg-white/5 rounded-lg p-6">
+            {/* <div className="bg-white/5 rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-3">Classification</h3>
                 <dl className="space-y-3">
                     <div>
@@ -118,20 +136,48 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                         </dd>
                     </div>
                 </dl>
-            </div>
+            </div> */}
 
-            {/* Book Comparison */}
-            {data.comparison && data.comparison.length > 0 && (
+            {/* Book Comparison with Covers */}
+            {similarBooks.length > 0 && (
                 <div className="bg-white/5 rounded-lg p-6">
                     <h3 className="text-lg font-semibold mb-3">Similar Books</h3>
-                    <ul className="space-y-4">
-                        {data.comparison.map((book: any, idx: number) => (
-                            <li key={idx} className="text-white">
-                                <p className="font-medium">{book.title} <span className="text-white/50">by {book.author}</span></p>
-                                <p className="text-white/70 text-sm mt-1">{book.note}</p>
-                            </li>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        {similarBooks.map((book, idx) => (
+                            <div
+                                key={idx}
+                                className="cursor-pointer transform hover:scale-105 transition-transform duration-200 bg-white/10 rounded-lg overflow-hidden"
+                                onClick={() => setSelectedCover(book.coverUrl ?? "/no_cover.png")}
+                            >
+                                <div className="aspect-[3/4] relative">
+                                    <img
+                                        src={book.coverUrl ?? "/no_cover.png"}
+                                        alt={`${book.title} cover`}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div className="p-3 text-center">
+                                    <h3 className="text-sm font-semibold text-white mb-1 truncate">{book.title}</h3>
+                                    <p className="text-white/70 text-xs truncate">{book.author}</p>
+                                    <p className="text-white/50 text-xs mt-1">{book.note}</p>
+                                </div>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
+
+                    {/* Enlarged Cover Modal */}
+                    {selectedCover && (
+                        <div
+                            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+                            onClick={() => setSelectedCover(null)}
+                        >
+                            <img
+                                src={selectedCover}
+                                alt="Full cover"
+                                className="max-w-full max-h-full object-contain shadow-lg rounded-lg"
+                            />
+                        </div>
+                    )}
                 </div>
             )}
         </div>
