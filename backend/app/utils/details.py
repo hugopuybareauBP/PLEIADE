@@ -9,6 +9,7 @@ from backend.app.utils.parsers import parse_keywords, parse_numbered_line, parse
 # Analysis imports
 from backend.app.utils.llm import build_impact_analysis, build_chapter_breakdown
 from backend.app.utils.parsers import parse_impact_analysis
+from backend.app.utils.profile_generation import profile_generation_pipeline
 # Marketing imports
 from backend.app.utils.llm import build_ecommerce_description, build_tweet
 from backend.app.utils.parsers import parse_ecommerce
@@ -20,10 +21,11 @@ def generate_analysis_components(book_id):
     print(f"[GENERATE_ANALYSIS_COMPONENTS] Generating analysis for book {book_id}...")
     chunks = load_book_chunks(book_id)
     chapter_breakdown = build_chapter_breakdown(chunks)
+    print(chapter_breakdown)
 
     analysis = {
             "impact": parse_impact_analysis(build_impact_analysis(chapter_breakdown)),
-            "characters": [],
+            "characters": profile_generation_pipeline(chapter_breakdown),
             "chapters": chapter_breakdown 
         }
     
@@ -67,13 +69,27 @@ def generate_overview_components(book_id: str) -> dict:
 def generate_marketing_components(book_id):
     print(f"[GENERATE_MARKETING_COMPONENTS] Generating marketing for book {book_id}...")
     book_data = load_book_details(book_id)
-    synopsis = book_data.get("analysis", {}).get("synopsis", "")
+    synopsis = book_data.get("overview", {}).get("synopsis", "")
     title = load_book_title(book_id)
 
     marketing = {
         "ecommerce": parse_ecommerce(build_ecommerce_description(synopsis, title)),
         "social": {
             "twitter": [
+                {
+                    "content" : build_tweet(synopsis),
+                    "metrics" : {
+                        "likes": rd.randint(0, 100),
+                        "retweets": rd.randint(0, 100)
+                    }
+                },
+                {
+                    "content" : build_tweet(synopsis),
+                    "metrics" : {
+                        "likes": rd.randint(0, 100),
+                        "retweets": rd.randint(0, 100)
+                    }
+                },
                 {
                     "content" : build_tweet(synopsis),
                     "metrics" : {
