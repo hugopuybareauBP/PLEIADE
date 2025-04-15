@@ -62,15 +62,15 @@
         },
         "characters": [
             {
-                "group": "Quantum Theorists",
+                "character_name": "Quantum Theorists",
                 "description": "Laying the mathematical foundation for quantum computing."
             },
             {
-                "group": "Industry Leaders",
+                "character_name": "Industry Leaders",
                 "description": "Companies and teams working on real-world quantum chips."
             },
             {
-                "group": "Policy Thinkers",
+                "character_name": "Policy Thinkers",
                 "description": "Experts forecasting regulatory and economic impact."
             }
         ],

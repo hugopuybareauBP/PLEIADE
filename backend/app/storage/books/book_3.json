@@ -61,15 +61,15 @@
         },
         "characters": [
             {
-                "group": "Creative Developers",
+                "character_name": "Creative Developers",
                 "description": "Profiles of coders who treat programming as artistic practice."
             },
             {
-                "group": "Educators",
+                "character_name": "Educators",
                 "description": "Those reshaping how we teach programming creatively."
             },
             {
-                "group": "Design Thinkers",
+                "character_name": "Design Thinkers",
                 "description": "Experts blending UX design with engineering principles."
             }
         ],

@@ -18,15 +18,15 @@
         },
         "characters": [
             {
-                "group": "Expert Researchers",
+                "character_name": "Expert Researchers",
                 "description": "Key stakeholders discussing AI's impact and future directions."
             },
             {
-                "group": "Industry Leaders",
+                "character_name": "Industry Leaders",
                 "description": "Key stakeholders discussing AI's impact and future directions."
             },
             {
-                "group": "AI Practitioners",
+                "character_name": "AI Practitioners",
                 "description": "Key stakeholders discussing AI's impact and future directions."
             }
         ],
@@ -95,7 +95,7 @@
                 "4G (Research & development)"
             ]
         },
-        "comparison" : []
+        "comparison": []
     },
     "marketing": {
         "ecommerce": {

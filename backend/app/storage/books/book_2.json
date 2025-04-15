@@ -62,15 +62,15 @@
         },
         "characters": [
             {
-                "group": "Digital Artists",
+                "character_name": "Digital Artists",
                 "description": "Exploring how artists use tech tools to innovate creatively."
             },
             {
-                "group": "Creative Entrepreneurs",
+                "character_name": "Creative Entrepreneurs",
                 "description": "Profiles of founders reshaping creative business models."
             },
             {
-                "group": "Platform Designers",
+                "character_name": "Platform Designers",
                 "description": "Those building the tools enabling this digital shift."
             }
         ],

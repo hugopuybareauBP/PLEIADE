@@ -62,15 +62,15 @@
         },
         "characters": [
             {
-                "group": "Neuroscientists",
+                "character_name": "Neuroscientists",
                 "description": "Experts who explore the brain's creative functions."
             },
             {
-                "group": "Innovators",
+                "character_name": "Innovators",
                 "description": "Real-world figures pushing boundaries in their field."
             },
             {
-                "group": "Educators & Coaches",
+                "character_name": "Educators & Coaches",
                 "description": "Helping others cultivate creativity."
             }
         ],
