@@ -1,6 +1,7 @@
 # backend/app/generation/llm.py
 
 from ollama import chat
+from typing import List
 
 ### ANALYSIS DETAILS ###
 
@@ -24,7 +25,7 @@ def summarize_chunk_with_mistral(chunk_text: str, chunk_id: int) -> dict:
     )
 
     return {
-        "chunk_id": chunk_id,
+        "chapter_name": f"Chapter {chunk_id+1}",
         "raw_output": response["message"]["content"]
     }
 
@@ -41,7 +42,7 @@ def build_chapter_breakdown(chunks) -> dict:
 
 def build_impact_analysis(chapter_breakdown) -> str:
     print(f"[BUILD_IMPACT_ANALYSIS] Building impact analysis...")
-    context = "\n".join([c["summary"] for c in chapter_breakdown])
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown])
 
     prompt = (
         f"You are a professional book analyst.\n"
@@ -61,12 +62,81 @@ def build_impact_analysis(chapter_breakdown) -> str:
 
     return response["message"]["content"]
 
+# Character profile generation
+
+def build_character_candidates_from_chunk(text: str) -> List[str]:
+    prompt = (
+        "Your task is to extract the full names of **fictional characters** explicitly mentioned in the following book excerpt. "
+        "Only list characters that are named clearly — do not invent or infer roles from pronouns or vague titles.\n\n"
+        "Return the result as a bullet list.\n\n"
+        f"{text}"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
+    )
+
+    raw_output = response["message"]["content"]
+
+    return raw_output
+
+def build_top_characters(unique_candidates: List[str], n: int = 10):
+    prompt = (
+        f"You are analyzing a book. Here is a list of character names that were mentioned:\n\n"
+        + "\n".join(f"- {name}" for name in unique_candidates)
+        + f"\n\nYour task is to:\n"
+        f"- Identify and merge duplicate names (e.g. 'Mad Hatter' and 'The Hatter').\n"
+        f"- Remove generic or repeated entries.\n"
+        f"- Select the most important or relevant characters from this list.\n"
+        f"- Return **only** a bullet list of a maximum of {n} cleaned names\n\n"
+        f"Do not include explanations, instance counts, or parentheticals. Just the list.\n"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
+    )
+
+    raw_output = response["message"]["content"]
+
+    return raw_output
+
+def build_character_profile(character_name: str, context: str):
+    prompt = (
+        f"You are a literary analyst tasked with writing a factual and concise character profile.\n"
+        f"Return your answer as a JSON list in the following format:\n"
+        f'{{"character": "{character_name}", "description": "<concise profile based only on the context>"}}\n'
+        f"Use **only** the information provided in the context below.\n"
+        f"If the information is vague, keep your answer general and do not invent details.\n"
+        f"---\n"
+        f"{context}\n"
+        f"---\n"
+        f"Now write the character profile as JSON:"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
+    )
+
+    return response["message"]["content"]
+
 ### MARKETING DETAILS ###
 
 def build_ecommerce_description(synopsis: str, title) -> str:
     prompt = (
-        f"You are a professional copywriter writing an e-commerce book description.\n\n"
-        f"Here is a short synopsis of the book called : {title}.\n"
+        f"You are a professional copywriter creating an e-commerce book description.\n\n"
+        f"Here is a short synopsis of the book:\n"
         f"{synopsis}\n\n"
         f"Based on this, return a compelling and professional product description as a JSON object with this format:\n"
         f"{{\n"
@@ -95,7 +165,10 @@ def build_tweet(synopsis) -> str:
 
     response = chat(
         model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.8
+        }
     )
 
     return response["message"]["content"]
@@ -104,7 +177,7 @@ def build_tweet(synopsis) -> str:
 
 def build_synopsis(chapter_breakdown, title) -> str: # First 5 chapters though
     print(f"[BUILD_SYNOPSIS] Building synopsis...")
-    context = "\n".join([c["summary"] for c in chapter_breakdown[:5]])
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:5]])
      
     prompt = (
         f"You are a professional editor writing a short synopsis for a book.\n\n"
@@ -132,7 +205,7 @@ def build_synopsis(chapter_breakdown, title) -> str: # First 5 chapters though
 
 def build_time_period(synopsis, chapter_breakdown):
     print(f"[BUILD_TIME_PERIOD] Building time period...")
-    context = "\n".join([c["summary"] for c in chapter_breakdown[:5]])
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:5]])
 
     prompt = (
         f"Based on the synopsis and chapters below, identify the time period covered by the book (e.g., 'Present day', '2030-2045', '19th century to now').\n"
@@ -144,14 +217,18 @@ def build_time_period(synopsis, chapter_breakdown):
 
     response = chat(
         model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
+
     )
 
     return response["message"]["content"]
 
 def build_genres(synopsis, chapter_breakdown):
     print(f"[BUILD_GENRES] Building genres...")
-    context = "\n".join([c["summary"] for c in chapter_breakdown[:5]])
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:5]])
 
     prompt = (
         f"Based on the synopsis and chapters below, identify the genres of the book (e.g., 'Science Fiction', 'Romance', 'Historical Fiction').\n"
@@ -163,14 +240,17 @@ def build_genres(synopsis, chapter_breakdown):
 
     response = chat(
         model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
     )
 
     return response["message"]["content"]
 
 def build_tone(synopsis, chapter_breakdown):
     print(f"[BUILD_TONE] Building tone...")
-    context = "\n".join([c["summary"] for c in chapter_breakdown[:5]])
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:5]])
 
     prompt = (
         f"Based on the synopsis and chapters below, identify the tone of the book (e.g., 'Serious', 'Humorous', 'Dark').\n"
@@ -181,13 +261,16 @@ def build_tone(synopsis, chapter_breakdown):
     )
     response = chat(
         model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
     )
     return response["message"]["content"]
 
 def build_keywords(synopsis, chapter_breakdown):
     print(f"[BUILD_KEYWORDS] Building keywords...")
-    context = "\n".join([c["summary"] for c in chapter_breakdown[:5]])
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:5]])
 
     prompt = (
         f"Based on the synopsis and chapters below, identify 8 keywords that best represent the book.\n"
@@ -199,7 +282,10 @@ def build_keywords(synopsis, chapter_breakdown):
 
     response = chat(
         model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
     )
 
     return response["message"]["content"]
