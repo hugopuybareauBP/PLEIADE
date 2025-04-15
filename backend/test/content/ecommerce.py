@@ -9,7 +9,7 @@ from rich.panel import Panel
 # Initialize console
 console = Console()
 
-with open("backend/test/content/dumps/synopsis_echoes.json", "r", encoding="utf-8") as file:
+with open("backend/test/content/dumps/synopsis_echoes_2.json", "r", encoding="utf-8") as file:
     data = json.load(file)
     synopsis = data["synopsis"]
 
@@ -36,8 +36,9 @@ def generate_ecommerce_description(synopsis: str) -> str:
 
 if __name__ == "__main__":
     start = time.time()
-    console.print(Panel(f"[bold cyan] Generating e-commerce description[/]"))
-    description = generate_ecommerce_description(synopsis)
-    console.print(Panel(f"[bold magenta]E-commerce Description:\n{description}[/]"))
-    console.print(Panel(f"[bold green]Tile elapsed : {time.time()-start:.2f} seconds ![/]"))
+    console.print(f"[bold cyan] Generating e-commerce description[/]")
+    for i in range(5):
+        description = generate_ecommerce_description(synopsis)
+        console.print(f"[bold magenta]E-commerce Description:\n{description}[/]")
+        console.print(f"[bold green]Time elapsed : {time.time()-start:.2f} seconds ![/]")
 
