@@ -20,7 +20,7 @@ def summarize_chunk_with_mistral(chunk_text: str, chunk_id: int) -> dict:
     )
     response = chat(
         model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+        messages=[{"role": "user", "content": prompt}],
     )
 
     return {
