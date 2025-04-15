@@ -121,7 +121,6 @@ def compress_chapter_safe(text: str, min_words: int = 100, threshold_words: int 
 
     return compressed
 
-
 def preprocessing_pipeline(text: str) -> List[str]:
     print(f"[PREPROCESSING_PIPELINE] Starting preprocessing pipeline.")
     text = remove_gutenberg_boilerplate(text)
