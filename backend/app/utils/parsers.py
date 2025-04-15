@@ -3,7 +3,9 @@
 import json
 import re
 
-# Marketing parsers
+from typing import List
+
+### MARKETING PARSERS ###
 
 def parse_ecommerce(raw: str) -> dict:
     try:
@@ -36,7 +38,7 @@ def parse_ecommerce(raw: str) -> dict:
             "closing": []
         }
     
-# Overview parsers
+### OVERVIEW PARSERS ###
 
 def parse_keywords(raw_output: str):
     # remove numbered list and commas
@@ -97,7 +99,7 @@ def parse_comparison(raw_output):
 
         return json.dumps(results, indent=4)
 
-# Analysis parsers
+### ANALYSIS PARSERS ###
 
 def parse_impact_analysis(raw_text: str) -> dict:
     try:
@@ -118,3 +120,35 @@ def parse_impact_analysis(raw_text: str) -> dict:
             "strengths": strengths,
             "weaknesses": weaknesses
         }
+    
+def parse_character_candidates(raw_output: str) -> List[str]:
+    lines = [line.strip("-• \n") for line in raw_output.splitlines() if line.strip()]
+    candidates = []
+
+    for line in lines:
+        # numbers
+        line = re.sub(r"^\d+[\.\)]\s*", "", line)
+
+        # ()
+        line = re.sub(r"\s*\(.*?\)", "", line).strip()
+
+        if line:
+            candidates.append(line)
+
+    return candidates
+
+def parse_top_characters(raw_output: str) -> List[str]:
+    important_start = re.search(r"(?i)(the\s+10\s+most\s+important.*?)\n", raw_output)
+
+    if important_start:
+        second_list = raw_output[important_start.end():]
+    else:
+        second_list = raw_output
+
+    lines = [
+        re.sub(r"^\d+[\.\)]\s*", "", line.strip("-• \n"))  # remove bullets and numbering
+        for line in second_list.splitlines()
+        if line.strip()
+    ]
+
+    return lines
