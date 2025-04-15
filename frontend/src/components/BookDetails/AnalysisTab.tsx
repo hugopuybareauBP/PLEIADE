@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 
 interface Chapter {
-    title: string;
-    summary: string;
+    chapter_name: string;
+    raw_output: string;
 }
 
 interface Character {
-    group: string;
+    character_name: string;
     description: string;
 }
 
@@ -101,8 +101,8 @@ const AnalysisTab: React.FC<Props> = ({ bookId }) => {
                                 {index + 1}
                             </span>
                             <div>
-                                <h4 className="font-medium">{chapter.title}</h4>
-                                <p className="text-white/70 text-sm mt-1">{chapter.summary}</p>
+                                <h4 className="font-medium">{chapter.chapter_name}</h4>
+                                <p className="text-white/70 text-sm mt-1">{chapter.raw_output}</p>
                             </div>
                         </div>
                     ))}
@@ -114,7 +114,7 @@ const AnalysisTab: React.FC<Props> = ({ bookId }) => {
                 <ul className="space-y-3">
                     {data.characters.map((character, index) => (
                         <div key={index} className="border-b border-white/10 pb-4">
-                            <h4 className="font-medium mb-2">{character.group}</h4>
+                            <h4 className="font-medium mb-2">{character.character_name}</h4>
                             <p className="text-white/70">{character.description}</p>
                         </div>
                     ))}
