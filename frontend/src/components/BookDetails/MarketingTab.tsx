@@ -93,7 +93,7 @@ const MarketingTab: React.FC<Props> = ({ bookId }) => {
                     </div>
 
                     {/* Instagram */}
-                    <div>
+                    {/* <div>
                         <h4 className="text-lg font-medium mb-3">Instagram Posts</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {data.social.instagram.map((post, i) => (
@@ -113,10 +113,10 @@ const MarketingTab: React.FC<Props> = ({ bookId }) => {
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* TikTok */}
-                    <div>
+                    {/* <div>
                         <h4 className="text-lg font-medium mb-3">TikTok Posts</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {data.social.tiktok.map((post, i) => (
@@ -137,12 +137,12 @@ const MarketingTab: React.FC<Props> = ({ bookId }) => {
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
             {/* Visuals */}
-            <div className="bg-white/5 rounded-lg p-6">
+            {/* <div className="bg-white/5 rounded-lg p-6">
                 <h3 className="text-xl font-semibold mb-4">Visual Content</h3>
                 <div className="grid grid-cols-2 gap-4">
                     {data.visuals.map((url, i) => (
@@ -157,7 +157,7 @@ const MarketingTab: React.FC<Props> = ({ bookId }) => {
                         </div>
                     ))}
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };
