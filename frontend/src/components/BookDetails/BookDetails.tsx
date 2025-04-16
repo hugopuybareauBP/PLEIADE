@@ -1,10 +1,8 @@
 import OverviewTab from './OverviewTab';
 import AnalysisTab from './AnalysisTab';
 import MarketingTab from './MarketingTab';
-// import ChatTab from './src/components/BookDetails/ChatTab';
-// import AudioTab from './BookDetails/AudioTab';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     ArrowLeft,
     BookOpen,
@@ -12,8 +10,7 @@ import {
     Share2,
     MessageSquare,
     Headphones,
-    Loader2,
-    UserCircle
+    Loader2
 } from 'lucide-react';
 
 interface BookDetailsProps {
@@ -38,15 +35,29 @@ const tabs = [
 
 const BookDetails = ({ book, onBack }: BookDetailsProps) => {
     const [activeTab, setActiveTab] = useState('overview');
-    const [isLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDetails = async () => {
+            try {
+                await fetch(`${import.meta.env.VITE_API_URL}/books/${book.id}/details`);
+            } catch (err) {
+                console.error("Error generating book details", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchDetails();
+    }, [book.id]);
 
     const renderTabContent = () => {
         switch (activeTab) {
             case 'overview': return <OverviewTab bookId={book.id} />;
             case 'analysis': return <AnalysisTab bookId={book.id} />;
             case 'marketing': return <MarketingTab bookId={book.id} />;
-            //   case 'chat': return <ChatTab book={book} />;
-            //   case 'audio': return <AudioTab book={book} />;
+            // case 'chat': return <ChatTab book={book} />;
+            // case 'audio': return <AudioTab book={book} />;
             default:
                 return null;
         }
@@ -65,7 +76,7 @@ const BookDetails = ({ book, onBack }: BookDetailsProps) => {
             <div className="flex flex-col md:flex-row gap-8 mb-8">
                 <div className="w-full md:w-1/3 lg:w-1/4">
                     <img
-                        src={book.cover || '/no_cover.png'}
+                        src={`${import.meta.env.VITE_API_URL}${book.cover}`}
                         alt={book.title}
                         className="w-full rounded-lg shadow-lg"
                     />
@@ -76,6 +87,7 @@ const BookDetails = ({ book, onBack }: BookDetailsProps) => {
                 </div>
             </div>
 
+            {/* Tabs */}
             <div className="border-b border-white/20 mb-6">
                 <div className="flex space-x-4 overflow-x-auto">
                     {tabs.map((tab) => {
@@ -84,10 +96,11 @@ const BookDetails = ({ book, onBack }: BookDetailsProps) => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center px-4 py-2 text-sm font-medium whitespace-nowrap ${activeTab === tab.id
-                                    ? 'text-white border-b-2 border-white'
-                                    : 'text-white/70 hover:text-white'
-                                    }`}
+                                className={`flex items-center px-4 py-2 text-sm font-medium whitespace-nowrap ${
+                                    activeTab === tab.id
+                                        ? 'text-white border-b-2 border-white'
+                                        : 'text-white/70 hover:text-white'
+                                }`}
                             >
                                 <Icon className="h-4 w-4 mr-2" />
                                 {tab.label}
@@ -97,10 +110,12 @@ const BookDetails = ({ book, onBack }: BookDetailsProps) => {
                 </div>
             </div>
 
+            {/* Tab content */}
             <div className="min-h-[400px]">
                 {isLoading ? (
                     <div className="flex items-center justify-center h-full">
                         <Loader2 className="h-8 w-8 text-white animate-spin" />
+                        <span className="ml-3 text-white text-lg">Generating book details...</span>
                     </div>
                 ) : (
                     <div className="text-white">
@@ -110,6 +125,6 @@ const BookDetails = ({ book, onBack }: BookDetailsProps) => {
             </div>
         </div>
     );
-}
+};
 
 export default BookDetails;
