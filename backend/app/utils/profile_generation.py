@@ -21,7 +21,7 @@ def get_all_character_candidates_from_book(book_chunks: List[str], chunk_group_s
 
     for i in range(0, len(book_chunks), chunk_group_size):
         grouped_text = "\n\n".join(book_chunks[i:i + chunk_group_size])
-        print(f"🔍 Processing chunks {i}–{i + chunk_group_size - 1}")
+        print(f"[PROFILE GENERATION PIPELINE] 🔍 Processing chunks {i}–{i + chunk_group_size - 1}")
         candidates = parse_character_candidates(build_character_candidates_from_chunk(grouped_text))
         all_candidates.extend(candidates)
 
@@ -67,7 +67,7 @@ def parse_character_profile(raw_output: str):
         description = data.get("description", "").strip()
 
         if character and description:
-            return {"character": character, "description": description}
+            return {"character_name": character, "description": description}
         return None
 
     except Exception as e:
