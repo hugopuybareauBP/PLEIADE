@@ -45,10 +45,21 @@ def parse_keywords(raw_output: str):
     cleaned = re.sub(r"\d+\.\s*", "", raw_output.strip())
     return [kw.strip().strip(",") for kw in cleaned.split(",") if kw.strip()]
 
-def parse_numbered_line(raw_output: str) -> str:
-    items = re.findall(r"\d+\.\s*([^,\n]+)", raw_output)
-    cleaned = ", ".join(item.strip() for item in items if item.strip())
-    return cleaned
+def parse_numbered_or_comma_list(raw_output: str) -> str:
+    # Try to extract from numbered list (e.g., "1. Genre1", "2. Genre2")
+    numbered = re.findall(r"\d+\.\s*([^\n]+)", raw_output)
+    
+    if numbered:
+        items = [item.strip().strip(",.") for item in numbered]
+    else:
+        # Fallback: split by commas
+        items = [item.strip().strip(",.") for item in raw_output.split(",") if item.strip()]
+
+    return ", ".join(items)
+
+def parse_thema_code_output(raw_output):
+    match = re.match(r'\b([A-Z]{1,2})\b', raw_output.strip())
+    return match.group(1) if match else None
 
 def parse_comparison(raw_output):
     try:

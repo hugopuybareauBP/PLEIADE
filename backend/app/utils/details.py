@@ -5,7 +5,8 @@ import random as rd
 # Overview imports
 from backend.app.utils.llm import build_synopsis, build_time_period, build_genres, build_tone, build_keywords, build_comparison
 from backend.app.utils.key_data import build_key_data
-from backend.app.utils.parsers import parse_keywords, parse_numbered_line, parse_comparison
+from backend.app.utils.thema_code import thema_code_pipeline
+from backend.app.utils.parsers import parse_keywords, parse_numbered_or_comma_list, parse_comparison
 # Analysis imports
 from backend.app.utils.llm import build_impact_analysis, build_chapter_breakdown
 from backend.app.utils.parsers import parse_impact_analysis
@@ -15,13 +16,12 @@ from backend.app.utils.llm import build_ecommerce_description, build_tweet
 from backend.app.utils.parsers import parse_ecommerce
 
 # Storage imports
-from backend.app.storage.storage import load_book_chunks, load_book_details, load_book_text, load_book_title
+from backend.app.storage.storage import load_book_chunks, load_book_details, load_book_text, load_book_title, load_book_pages
 
 def generate_analysis_components(book_id):
     print(f"[GENERATE_ANALYSIS_COMPONENTS] Generating analysis for book {book_id}...")
     chunks = load_book_chunks(book_id)
     chapter_breakdown = build_chapter_breakdown(chunks)
-    print(chapter_breakdown)
 
     analysis = {
             "impact": parse_impact_analysis(build_impact_analysis(chapter_breakdown)),
@@ -36,21 +36,22 @@ def generate_overview_components(book_id: str) -> dict:
     book_data = load_book_details(book_id)
     chapter_breakdown = book_data.get("analysis", {}).get("chapters", "")
     title = load_book_title(book_id)
+    pages = load_book_pages(book_id)
     synopsis = build_synopsis(chapter_breakdown, title)
     text = load_book_text(book_id)
     keywords = parse_keywords(build_keywords(synopsis, chapter_breakdown))
 
     overview = {
         "synopsis": synopsis,
-        "keyData": build_key_data(text, chapter_breakdown),
+        "keyData": build_key_data(text, chapter_breakdown, pages),
         "contentAnalysis": {
             "timePeriod": build_time_period(synopsis, chapter_breakdown),
-            "genres": parse_numbered_line(build_genres(synopsis, chapter_breakdown)),
-            "tone": parse_numbered_line(build_tone(synopsis, chapter_breakdown)),
+            "genres": parse_numbered_or_comma_list(build_genres(synopsis, chapter_breakdown)),
+            "tone": parse_numbered_or_comma_list(build_tone(synopsis, chapter_breakdown)),
             "keywords": keywords,
         },
         "classification": {
-            "primaryThema": "",
+            "primaryThema": thema_code_pipeline(synopsis),
             "secondaryThema": [
                 {"code": "UBJ", "label": "Impact of AI on social connections"},
                 {"code": "KJM", "label": "AI in business strategy"},

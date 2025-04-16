@@ -58,8 +58,6 @@ def build_impact_analysis(chapter_breakdown) -> str:
         messages=[{"role": "user", "content": prompt}]
     )
 
-    print(f"[BUILD_IMPACT_ANALYSIS] Response: {response['message']['content']}")
-
     return response["message"]["content"]
 
 # Character profile generation
@@ -205,18 +203,18 @@ def build_synopsis(chapter_breakdown, title) -> str: # First 5 chapters though
 
 def build_time_period(synopsis, chapter_breakdown):
     print(f"[BUILD_TIME_PERIOD] Building time period...")
-    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:5]])
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:3]])
 
     prompt = (
         f"Based on the synopsis and chapters below, identify the time period covered by the book (e.g., 'Present day', '2030-2045', '19th century to now').\n"
         f"Consider historical events, cultural references, and any other relevant details.\n"
-        f"One sentence is enough.\n\n"
+        f"5 words is enough.\n\n"
         f"Synopsis:\n{synopsis}\n\n"
         f"Chapter summaries:\n{context}"
     )
 
     response = chat(
-        model="mistral",
+        model="mistral:instruct",
         messages=[{"role": "user", "content": prompt}],
         options={
             "temperature": 0.2,
@@ -233,34 +231,38 @@ def build_genres(synopsis, chapter_breakdown):
     prompt = (
         f"Based on the synopsis and chapters below, identify the genres of the book (e.g., 'Science Fiction', 'Romance', 'Historical Fiction').\n"
         f"Consider themes, characters, and any other relevant details.\n"
-        f"**Just give 3 genres, separated by commas. Do not make a sentence or add any words.**\n\n"
+        f"**Just give 3 genres, separated by commas. e.g (\"Technology, Business, Future Studies\").\n"
+        f"Do not make a sentence or add any words.**\n\n"
         f"Synopsis:\n{synopsis}\n\n"
         f"Chapter summaries:\n{context}"
     )
 
     response = chat(
-        model="mistral",
+        model="mistral:instruct",
         messages=[{"role": "user", "content": prompt}],
         options={
             "temperature": 0.2,
         }
     )
 
+    print(response["message"]["content"])
+
     return response["message"]["content"]
 
 def build_tone(synopsis, chapter_breakdown):
     print(f"[BUILD_TONE] Building tone...")
-    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:5]])
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:3]])
 
     prompt = (
         f"Based on the synopsis and chapters below, identify the tone of the book (e.g., 'Serious', 'Humorous', 'Dark').\n"
         f"Consider writing style, character interactions, and any other relevant details.\n"
-        f"**Just give 3 tones, separated by commas. Do not make a sentence or add any other words/number.**\n\n"
+        f"**Just give 3 tones, separated by commas. e.g (\"Informative, Optimistic, Balanced\").\n"
+        f"Do not make a sentence or add any other words/number.**\n\n"
         f"Synopsis:\n{synopsis}\n\n"
         f"Chapter summaries:\n{context}"
     )
     response = chat(
-        model="mistral",
+        model="mistral:instruct",
         messages=[{"role": "user", "content": prompt}],
         options={
             "temperature": 0.2,
@@ -270,21 +272,71 @@ def build_tone(synopsis, chapter_breakdown):
 
 def build_keywords(synopsis, chapter_breakdown):
     print(f"[BUILD_KEYWORDS] Building keywords...")
-    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:5]])
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:3]])
 
     prompt = (
         f"Based on the synopsis and chapters below, identify 8 keywords that best represent the book.\n"
-        f"Consider themes, characters, and any other relevant details.\n"
+        f"Consider themes, and any other relevant details.\n"
+        f"DO NOT INCLUDE CHARACTER NAMES.\n"
         f"**Just give 8 keywords, separated by commas. Do not make a sentence or add any other words/number.**\n\n"
         f"Synopsis:\n{synopsis}\n\n"
         f"Chapter summaries:\n{context}"
     )
 
     response = chat(
-        model="mistral",
+        model="mistral:instruct",
         messages=[{"role": "user", "content": prompt}],
         options={
             "temperature": 0.2,
+        }
+    )
+
+    return response["message"]["content"]
+
+def build_1st_letter_thema_code(synopsis):
+    prompt = (
+        f"You are a book classification assistant.\n"
+        f"Your task is to assign the correct primary Thema code (only the first letter) to the following book, based on its synopsis.\n\n"
+        f"Choose ONE of the following Thema codes:\n"
+        f"A - The Arts\n"  
+        f"C - Language and Linguistics\n" 
+        f"D - Biography, Literature and Literary studies\n"  
+        f"F - Fiction\n"  
+        f"G - Reference, Information and Interdisciplinary subjects\n"  
+        f"J - Society and Social Sciences\n"  
+        f"K - Economics, Finance, Business and Management\n"  
+        f"L - Law\n"  
+        f"M - Medicine and Nursing\n"  
+        f"N - History and Archaeology\n"  
+        f"P - Mathematics and Science\n"  
+        f"Q - Philosophy\n"  
+        f"R - Earth Sciences, Geography, Environment, Planning\n"  
+        f"S - Sports and Active outdoor recreation\n"  
+        f"T - Technology, Engineering, Agriculture, Industrial processes\n"  
+        f"U - Computing and Information Technology\n"  
+        f"V - Health, Relationships and Personal development\n"  
+        f"W - Lifestyle, Hobbies and Leisure\n"  
+        f"X - Graphic novels, Comic books, Manga, Cartoons\n"  
+        f"Y - Children’s, Teenage and Educational\n\n"
+        f"Return ONLY the code (e.g. \"F\", \"Q\", etc.).\n"
+        f"Here is the synopsis of the book:\n\n"
+        f"{synopsis}"
+    )
+
+    response = chat(
+        model="mistral",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["message"]["content"]
+
+def build_2nd_letter_thema_code(synopsis, prompt):
+    prompt += synopsis
+    response = chat(
+        model="mistral:instruct",
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.5
         }
     )
 
@@ -301,8 +353,11 @@ def build_comparison(synopsis, keywords):
     )
     
     response = chat(
-        model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+        model="mistral:instruct",
+        messages=[{"role": "user", "content": prompt}],
+        options={
+            "temperature": 0.2,
+        }
     )
 
     return response["message"]["content"]

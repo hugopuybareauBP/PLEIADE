@@ -5,14 +5,13 @@ import math
 
 nlp = spacy.load("en_core_web_sm")
 
-def build_key_data(text: str, chapter_breakdown) -> dict:
+def build_key_data(text: str, chapter_breakdown, pages) -> dict:
     # Key data 
     total_words = len(text.split())
     reading_minutes = total_words/250 
     hours = int(reading_minutes / 60)
     minutes = int(reading_minutes % 60)
     estimated_reading_time = f"{hours}h {minutes}m" if hours > 0 else f"{minutes} minutes"
-    estimated_pages = math.ceil(total_words / 250)
     chapter_count = len(chapter_breakdown)
 
     # NLP analysis
@@ -24,7 +23,7 @@ def build_key_data(text: str, chapter_breakdown) -> dict:
     key_data = {
         "estimatedReadingTime": estimated_reading_time,
         "wordCount": f"{total_words} words",
-        "pages": f"{estimated_pages} pages",
+        "pages": f"{pages} pages",
         "chapters": f"{chapter_count} chapters",
         "mainCharacters": f"{len(people)} characters mentioned",
         "keyLocations": f"{len(locations)} locations mentioned",
