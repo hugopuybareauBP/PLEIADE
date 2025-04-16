@@ -1,10 +1,11 @@
 # backend/app/main.py
 
 import uvicorn
-import logging
+import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from backend.app.routers import upload # UploadPage
 
@@ -16,8 +17,8 @@ app = FastAPI(
     debug=True
 )
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+covers_path = os.path.join("backend", "app", "storage", "covers")
+app.mount("/covers", StaticFiles(directory=covers_path), name="covers")
 
 # CORS middleware
 origins = [
