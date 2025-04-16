@@ -75,9 +75,9 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                     <div className="space-y-4">
                         <OverviewItem icon={<Clock />} label="Estimated Reading Time" value={data.keyData.estimatedReadingTime} />
                         <OverviewItem icon={<FileText />} label="Word Count" value={data.keyData.wordCount} />
-                        <OverviewItem icon={<BookOpen />} label="Number of Pages" value={data.keyData.pages} />
+                        <OverviewItem icon={<BookOpen />} label="Estimated number of pages" value={data.keyData.pages} />
                         <OverviewItem icon={<BarChart2 />} label="Number of Chapters" value={data.keyData.chapters} />
-                        <OverviewItem icon={<Users />} label="Main Characters" value={data.keyData.mainCharacters} />
+                        <OverviewItem icon={<Users />} label="Number of Characters" value={data.keyData.mainCharacters} />
                         <OverviewItem icon={<MapPin />} label="Key Locations" value={data.keyData.keyLocations} />
                     </div>
                 </div>
@@ -107,14 +107,14 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
             </div>
 
             {/* Classification */}
-            {/* <div className="bg-white/5 rounded-lg p-6">
+            <div className="bg-white/5 rounded-lg p-6">
                 <h3 className="text-lg font-semibold mb-3">Classification</h3>
                 <dl className="space-y-3">
                     <div>
                         <dt className="text-white/50">Primary Thema Code</dt>
                         <dd className="text-white">{data.classification.primaryThema}</dd>
                     </div>
-                    <div>
+                    {/* <div>
                         <dt className="text-white/50">Secondary Thema Codes</dt>
                         <dd className="space-y-1 mt-1">
                             {data.classification.secondaryThema.map((s: any, idx: number) => (
@@ -124,8 +124,8 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                                 </div>
                             ))}
                         </dd>
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                         <dt className="text-white/50">Qualifiers</dt>
                         <dd className="space-y-1 mt-1">
                             {data.classification.qualifiers.map((q: string, idx: number) => (
@@ -134,24 +134,24 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                                 </div>
                             ))}
                         </dd>
-                    </div>
+                    </div> */}
                 </dl>
-            </div> */}
+            </div>
 
             {/* Book Comparison with Covers */}
             {similarBooks.length > 0 && (
                 <div className="bg-white/5 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold mb-3">Similar Books</h3>
+                    <h3 className="text-lg font-semibold mb-3">Suggestions for similar Books</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {similarBooks.map((book, idx) => (
                             <div
                                 key={idx}
                                 className="cursor-pointer transform hover:scale-105 transition-transform duration-200 bg-white/10 rounded-lg overflow-hidden"
-                                onClick={() => setSelectedCover(book.coverUrl ?? "/no_cover.png")}
+                                onClick={() => setSelectedCover(book.coverUrl ?? `${import.meta.env.VITE_API_URL}/covers/no_cover.png`)}
                             >
                                 <div className="aspect-[3/4] relative">
                                     <img
-                                        src={book.coverUrl ?? "/no_cover.png"}
+                                        src={book.coverUrl ?? `${import.meta.env.VITE_API_URL}/covers/no_cover.png`}
                                         alt={`${book.title} cover`}
                                         className="w-full h-full object-cover"
                                     />
