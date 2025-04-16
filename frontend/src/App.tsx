@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, Upload, FileText, BarChart, MessageSquare, Headphones, Loader2, UserCircle } from 'lucide-react';
+import { BookOpen, UserCircle } from 'lucide-react';
 import BookCard from './components/BookCard';
 import UploadArea from './components/UploadArea';
 import BookDetails from './components/BookDetails/BookDetails';
@@ -10,10 +10,11 @@ interface Book {
     cover: string;
     author: string;
     uploadDate: string;
-    progress: number;   
+    progress: number;
     synopsis: string;
     full_text: string;
     chunks: [];
+    hasDetails: boolean;
 }
 
 function App() {
@@ -23,7 +24,7 @@ function App() {
     useEffect(() => {
         fetchBooks();
     }, []);
-    
+
     const fetchBooks = async () => {
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/books`);
@@ -33,6 +34,10 @@ function App() {
         } catch (error) {
             console.error("Error fetching books:", error);
         }
+    };
+
+    const handleBookClick = (book: Book) => {
+        setSelectedBook(book);
     };
 
     return (
@@ -54,7 +59,13 @@ function App() {
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {selectedBook ? (
-                    <BookDetails book={selectedBook} onBack={() => setSelectedBook(null)} />
+                    <BookDetails
+                        book={selectedBook}
+                        onBack={() => {
+                            setSelectedBook(null);
+                            fetchBooks();
+                        }}
+                    />
                 ) : (
                     <>
                         <UploadArea onUploadSuccess={fetchBooks} />
@@ -66,7 +77,8 @@ function App() {
                                     <BookCard
                                         key={book.id}
                                         book={book}
-                                        onClick={() => setSelectedBook(book)}
+                                        hasDetails={book.hasDetails}
+                                        onClick={() => handleBookClick(book)}
                                     />
                                 ))}
                             </div>
