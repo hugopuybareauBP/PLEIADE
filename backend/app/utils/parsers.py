@@ -5,6 +5,17 @@ import re
 
 from typing import List
 
+### GENERAL PARSERS ###
+
+def parse_model_json_response(raw_output: str) -> dict | None:
+    # Remove markdown code block wrappers like ```json
+    cleaned = re.sub(r"^```(?:json|python)?|```$", "", raw_output.strip(), flags=re.IGNORECASE | re.MULTILINE).strip()
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON parsing failed: {e}")
+        return None
+
 ### MARKETING PARSERS ###
 
 def parse_ecommerce(raw: str) -> dict:
@@ -26,11 +37,6 @@ def parse_ecommerce(raw: str) -> dict:
                 bullets.append(re.sub(r"^[-•]\s*", "", line))
             else:
                 description.append(line)
-
-        # # Separate closing from description (last 1-2 lines)
-        # if len(description) >= 2:
-        #     closing = description[-1]
-        #     description = description[:-1]
 
         return {
             "description": description,
@@ -135,31 +141,13 @@ def parse_impact_analysis(raw_text: str) -> dict:
 def parse_character_candidates(raw_output: str) -> List[str]:
     lines = [line.strip("-• \n") for line in raw_output.splitlines() if line.strip()]
     candidates = []
-
     for line in lines:
-        # numbers
-        line = re.sub(r"^\d+[\.\)]\s*", "", line)
-
-        # ()
-        line = re.sub(r"\s*\(.*?\)", "", line).strip()
-
+        line = re.sub(r"^\d+[\.\)]\s*", "", line)  # remove leading numbers
+        line = re.sub(r"\s*\(.*?\)", "", line).strip()  # remove parentheses
         if line:
             candidates.append(line)
-
     return candidates
 
 def parse_top_characters(raw_output: str) -> List[str]:
-    important_start = re.search(r"(?i)(the\s+10\s+most\s+important.*?)\n", raw_output)
-
-    if important_start:
-        second_list = raw_output[important_start.end():]
-    else:
-        second_list = raw_output
-
-    lines = [
-        re.sub(r"^\d+[\.\)]\s*", "", line.strip("-• \n"))  # remove bullets and numbering
-        for line in second_list.splitlines()
-        if line.strip()
-    ]
-
+    lines = [re.sub(r"^\d+[\.\)]\s*", "", line.strip("-• \n")) for line in raw_output.splitlines() if line.strip()]
     return lines

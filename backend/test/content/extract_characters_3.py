@@ -7,7 +7,6 @@ import torch
 
 from ollama import chat
 from typing import List
-from collections import defaultdict
 from sentence_transformers import SentenceTransformer, util
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
