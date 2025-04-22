@@ -2,9 +2,7 @@
 
 import os
 
-from ollama import chat
 from typing import List
-
 from openai import AzureOpenAI
 
 # Azure OpenAI Configuration
@@ -224,14 +222,14 @@ def build_synopsis(chapter_breakdown, title) -> str: # First 5 chapters though
 
     return response.choices[0].message.content
 
-def build_time_period(synopsis, chapter_breakdown):
+def build_time_period(synopsis, summaries):
     print(f"[BUILD_TIME_PERIOD] Building time period...")
-    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:3]])
+    context = "\n".join(summaries[:5])
 
     prompt = (
         f"Based on the synopsis and chapters below, identify the time period covered by the book (e.g., 'Present day', '2030-2045', '19th century to now').\n"
         f"Consider historical events, cultural references, and any other relevant details.\n"
-        f"5 words is enough.\n\n"
+        f"The output should be maximum 10 words.\n\n"
         f"Synopsis:\n{synopsis}\n\n"
         f"Chapter summaries:\n{context}"
     )
@@ -239,7 +237,7 @@ def build_time_period(synopsis, chapter_breakdown):
     response = client.chat.completions.create(
         model=AZURE_OPENAI_MODEL_NAME,
         messages=[
-            {"role": "system", "content": "You are a professional book analyst."},
+            {"role": "system", "content": "You are a book publishing assistant."},
             {"role": "user", "content": prompt}
         ],
         temperature=0.1,
@@ -366,15 +364,17 @@ def build_1st_letter_thema_code(synopsis):
 
 def build_2nd_letter_thema_code(synopsis, prompt):
     prompt += synopsis
-    response = chat(
-        model="mistral:instruct",
-        messages=[{"role": "user", "content": prompt}],
-        options={
-            "temperature": 0.5
-        }
+    response = client.chat.completions.create(
+        model=AZURE_OPENAI_MODEL_NAME,
+        messages=[
+            {"role": "system", "content": "You are a book classification assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.1,
+        max_tokens=4096
     )
 
-    return response["message"]["content"]
+    return response.choices[0].message.content
 
 def build_comparison(synopsis, keywords):
     prompt = (

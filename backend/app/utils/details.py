@@ -6,7 +6,6 @@ import random as rd
 from backend.app.utils.llm import build_synopsis, build_time_period, build_genres, build_tone, build_keywords, build_comparison
 from backend.app.utils.key_data import build_key_data
 from backend.app.utils.thema_code import thema_code_pipeline
-from backend.app.utils.parsers import parse_keywords, parse_numbered_or_comma_list, parse_comparison
 # Analysis imports
 from backend.app.utils.llm import build_impact_analysis, build_chapter_breakdown
 from backend.app.utils.parsers import parse_impact_analysis
@@ -14,6 +13,8 @@ from backend.app.utils.profile_generation import profile_generation_pipeline
 # Marketing imports
 from backend.app.utils.llm import build_ecommerce_description, build_tweet
 from backend.app.utils.parsers import parse_ecommerce
+# Global imports
+from backend.app.utils.parsers import parse_model_json_response
 
 # Storage imports
 from backend.app.storage.storage import load_book_chunks, load_book_details, load_book_text, load_book_title, load_book_pages
@@ -39,15 +40,15 @@ def generate_overview_components(book_id: str) -> dict:
     pages = load_book_pages(book_id)
     synopsis = build_synopsis(chapter_breakdown, title)
     text = load_book_text(book_id)
-    keywords = parse_keywords(build_keywords(synopsis, chapter_breakdown))
+    keywords = build_keywords(synopsis, chapter_breakdown)
 
     overview = {
         "synopsis": synopsis,
         "keyData": build_key_data(text, chapter_breakdown, pages),
         "contentAnalysis": {
             "timePeriod": build_time_period(synopsis, chapter_breakdown),
-            "genres": parse_numbered_or_comma_list(build_genres(synopsis, chapter_breakdown)),
-            "tone": parse_numbered_or_comma_list(build_tone(synopsis, chapter_breakdown)),
+            "genres": build_genres(synopsis, chapter_breakdown),
+            "tone": build_tone(synopsis, chapter_breakdown),
             "keywords": keywords,
         },
         "classification": {
@@ -62,7 +63,7 @@ def generate_overview_components(book_id: str) -> dict:
                 "4G (Research & development)"
             ]
         },
-        "comparison" : parse_comparison(build_comparison(synopsis, keywords))
+        "comparison" : parse_model_json_response(build_comparison(synopsis, keywords))
     }
 
     return overview

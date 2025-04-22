@@ -3,8 +3,21 @@
 import json
 import re
 import time
+import os
 
-from ollama import chat
+from openai import AzureOpenAI
+
+# Azure OpenAI Configuration
+api_version = "2024-12-01-preview"
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+AZURE_OPENAI_MODEL_NAME = os.getenv("AZURE_OPENAI_MODEL_NAME")
+
+client = AzureOpenAI(
+    api_key=AZURE_OPENAI_API_KEY,
+    azure_endpoint=AZURE_OPENAI_ENDPOINT,
+    api_version=api_version,
+)
 
 def build_comparison(synopsis, keywords):
     prompt = (
@@ -16,61 +29,26 @@ def build_comparison(synopsis, keywords):
         f"Keywords:\n{keywords}\n\n"
     )
     
-    response = chat(
-        model="mistral",
-        messages=[{"role": "user", "content": prompt}]
+    response = client.chat.completions.create(
+        model=AZURE_OPENAI_MODEL_NAME,
+        messages=[
+            {"role": "system", "content": "You are a publishing expert."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.1,
+        max_tokens=4096
     )
 
-    return response["message"]["content"]
+    return response.choices[0].message.content
 
-def parse_comparison(raw_output):
+def parse_model_json_response(raw_output: str) -> dict | None:
+    # Remove markdown code block wrappers like ```json
+    cleaned = re.sub(r"^```(?:json|python)?|```$", "", raw_output.strip(), flags=re.IGNORECASE | re.MULTILINE).strip()
     try:
-        return json.loads(raw_output)
-    except json.JSONDecodeError:
-        results = []
-
-        # Split on entry numbers (1., 2., etc.)
-        entries = re.split(r"\n?\s*\d+\.\s*", raw_output.strip())
-
-        for entry in entries:
-            if not entry.strip():
-                continue
-
-            author, title, note = "", "", ""
-
-            # === CASE 1: Oneliner format ===
-            if "Short Note:" in entry:
-                author_match = re.search(r"Author:\s*(.*?),\s*Title:", entry)
-                title_match = re.search(r"Title:\s*\"?(.*?)\"?,\s*Short Note:", entry)
-                note_match = re.search(r"Short Note:\s*(.*)", entry, re.DOTALL)
-                
-                if author_match and title_match and note_match:
-                    author = author_match.group(1).strip()
-                    title = title_match.group(1).strip().strip('"')
-                    note = note_match.group(1).strip()
-
-            # === CASE 2: Multiline format ===
-            else:
-                lines = entry.strip().splitlines()
-                for line in lines:
-                    if line.strip().lower().startswith("author:"):
-                        author = line.split(":", 1)[1].strip()
-                    elif line.strip().lower().startswith("title:"):
-                        title = line.split(":", 1)[1].strip().strip('"')
-                    elif line.strip().lower().startswith("note:"):
-                        note = line.split(":", 1)[1].strip()
-                    else:
-                        # continuation of the note
-                        note += " " + line.strip()
-
-            if author and title:
-                results.append({
-                    "author": author,
-                    "title": title,
-                    "note": note.strip()
-                })
-
-        return json.dumps(results, indent=4)
+        return json.loads(cleaned)
+    except json.JSONDecodeError as e:
+        print(f"❌ JSON parsing failed: {e}")
+        return None
 
 
 if __name__ == "__main__":
@@ -80,14 +58,14 @@ if __name__ == "__main__":
     synopsis = data["synopsis"]
 
     keywords = [
-        'Project Echo',
-        'Dr. Evelyn Porter',
-        'Digital purgatory',
-        'Consciousness digitization',
-        'Memory',
-        'Identity',
-        'Enigmatic adversary',
-        'Sentinels'
+        "curiosity",
+        "imagination",
+        "absurdity",
+        "transformation",
+        "identity",
+        "surrealism",
+        "exploration",
+        "whimsy"
     ]
 
     # keywords = [
@@ -104,5 +82,5 @@ if __name__ == "__main__":
 
     comparison = build_comparison(synopsis, keywords)
     print(f"[COMPARISON] Response: {comparison}")
-    print(f"\n\n [PARSED COMPARISON] {parse_comparison(comparison)}")
+    print(f"\n\n [PARSED COMPARISON] {parse_model_json_response(comparison)}")
     print(f"Execution time: {time.time() - start:.2f} seconds")

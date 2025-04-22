@@ -1,7 +1,6 @@
 # backend/app/utils/profile_generation.py
 
 import torch
-import json
 
 from typing import List
 from sentence_transformers import SentenceTransformer, util
