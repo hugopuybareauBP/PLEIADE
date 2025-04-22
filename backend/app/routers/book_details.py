@@ -4,7 +4,7 @@ import time
 
 from fastapi import APIRouter, HTTPException
 from backend.app.storage.storage import load_book_details, save_book_details
-from backend.app.utils.details import (
+from backend.app.utils.details.details import (
     generate_overview_components,
     generate_analysis_components,
     generate_marketing_components
