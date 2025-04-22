@@ -249,7 +249,7 @@ def build_tweet(synopsis) -> str:
             {"role": "system", "content": "You are a social media content writer for a publishing house."},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.1,
+        temperature=0.6,
         max_tokens=4096
     )
 

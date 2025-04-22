@@ -3,11 +3,11 @@
 from typing import List
 
 # LLM
-from backend.app.utils.llm import build_location_candidates_from_chunk, build_top_locations, build_location_note
+from backend.app.utils.details.llm import build_location_candidates_from_chunk, build_top_locations, build_location_note
 # Parsing
-from backend.app.utils.parsers import parse_candidates, parse_top_candidates, parse_model_json_response
+from backend.app.utils.details.parsers import parse_candidates, parse_top_candidates, parse_model_json_response
 # Extraction
-from backend.app.utils.extraction import extract_relevant_chunks
+from backend.app.utils.details.extraction import extract_relevant_chunks
 
 def get_all_location_candidates_from_book(book_chunks: List[str], chunk_group_size: int = 5) -> List[str]:
     all_candidates = []

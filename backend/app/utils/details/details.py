@@ -3,19 +3,19 @@
 import random as rd
 
 # Overview imports
-from backend.app.utils.llm import build_synopsis, build_time_period, build_genres, build_tone, build_keywords, build_comparison
-from backend.app.utils.key_data import build_key_data
-from backend.app.utils.thema_code import thema_code_pipeline
-from backend.app.utils.parsers import parse_keywords
+from backend.app.utils.details.llm import build_synopsis, build_time_period, build_genres, build_tone, build_keywords, build_comparison
+from backend.app.utils.details.key_data import build_key_data
+from backend.app.utils.details.thema_code import thema_code_pipeline
+from backend.app.utils.details.parsers import parse_keywords
 # Analysis imports
-from backend.app.utils.llm import build_impact_analysis, build_chapter_breakdown
-from backend.app.utils.profile_generation import profile_generation_pipeline
-from backend.app.utils.location_generation import location_note_pipeline
+from backend.app.utils.details.llm import build_impact_analysis, build_chapter_breakdown
+from backend.app.utils.details.profile_generation import profile_generation_pipeline
+from backend.app.utils.details.location_generation import location_note_pipeline
 # Marketing imports
-from backend.app.utils.llm import build_ecommerce_description, build_tweet
-from backend.app.utils.parsers import parse_ecommerce
+from backend.app.utils.details.llm import build_ecommerce_description, build_tweet
+from backend.app.utils.details.parsers import parse_ecommerce
 # Global imports
-from backend.app.utils.parsers import parse_model_json_response
+from backend.app.utils.details.parsers import parse_model_json_response
 
 # Storage imports
 from backend.app.storage.storage import load_book_chunks, load_book_details, load_book_text, load_book_title, load_book_pages
@@ -80,13 +80,6 @@ def generate_marketing_components(book_id):
         "ecommerce": parse_ecommerce(build_ecommerce_description(synopsis, title)),
         "social": {
             "twitter": [
-                {
-                    "content" : build_tweet(synopsis),
-                    "metrics" : {
-                        "likes": rd.randint(0, 100),
-                        "retweets": rd.randint(0, 100)
-                    }
-                },
                 {
                     "content" : build_tweet(synopsis),
                     "metrics" : {

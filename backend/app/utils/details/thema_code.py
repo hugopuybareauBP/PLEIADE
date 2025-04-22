@@ -2,7 +2,7 @@
 
 import json
 
-from backend.app.utils.llm import build_1st_letter_thema_code, build_2nd_letter_thema_code
+from backend.app.utils.details.llm import build_1st_letter_thema_code, build_2nd_letter_thema_code
 from backend.app.storage.storage import get_2nd_letter_thema_code_prompt, get_thema_code_desc
 
 def thema_code_pipeline(synopsis: str):
