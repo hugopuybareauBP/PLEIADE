@@ -1,6 +1,7 @@
 import OverviewTab from './OverviewTab';
 import AnalysisTab from './AnalysisTab';
 import MarketingTab from './MarketingTab';
+import ChatTab from './ChatTab';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -9,7 +10,6 @@ import {
     BarChart2,
     Share2,
     MessageSquare,
-    Headphones,
     Loader2
 } from 'lucide-react';
 
@@ -29,7 +29,7 @@ const tabs = [
     { id: 'overview', label: 'Content Overview', icon: BookOpen },
     { id: 'analysis', label: 'Detailed Analysis', icon: BarChart2 },
     { id: 'marketing', label: 'Marketing', icon: Share2 },
-    // { id: 'chat', label: 'AI Chat', icon: MessageSquare },
+    { id: 'chat', label: 'AI Chat', icon: MessageSquare },
     // { id: 'audio', label: 'Audio', icon: Headphones },
 ];
 
@@ -56,7 +56,7 @@ const BookDetails = ({ book, onBack }: BookDetailsProps) => {
             case 'overview': return <OverviewTab bookId={book.id} />;
             case 'analysis': return <AnalysisTab bookId={book.id} />;
             case 'marketing': return <MarketingTab bookId={book.id} />;
-            // case 'chat': return <ChatTab book={book} />;
+            case 'chat': return <ChatTab bookId={book.id} />;
             // case 'audio': return <AudioTab book={book} />;
             default:
                 return null;
