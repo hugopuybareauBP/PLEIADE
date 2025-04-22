@@ -13,6 +13,7 @@ type BookWithCover = {
     author: string;
     note: string;
     coverUrl: string | null;
+    isbn: string | null;
 };
 
 const OverviewTab = ({ bookId }: OverviewTabProps) => {
@@ -33,17 +34,27 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                         details.overview.comparison.map(async (book: any) => {
                             const query = `intitle:${encodeURIComponent(book.title)}+inauthor:${encodeURIComponent(book.author)}`;
                             const url = `https://www.googleapis.com/books/v1/volumes?q=${query}`;
+
                             try {
                                 const res = await fetch(url);
                                 const json = await res.json();
-                                const coverUrl = json.items?.[0]?.volumeInfo?.imageLinks?.thumbnail ?? null;
-                                return { ...book, coverUrl };
+                                const info = json.items?.[0]?.volumeInfo;
+
+                                const coverUrl = info?.imageLinks?.thumbnail ?? null;
+
+                                // Extract first ISBN-13 or fallback to ISBN-10
+                                const isbn = info?.industryIdentifiers?.find(
+                                    (id: { type: string; identifier: string }) =>
+                                        id.type === "ISBN_13" || id.type === "ISBN_10"
+                                )?.identifier ?? null;
+
+                                return { ...book, coverUrl, isbn };
                             } catch {
-                                return { ...book, coverUrl: null };
+                                return { ...book, coverUrl: null, isbn: null };
                             }
                         })
                     );
-                    setSimilarBooks(enriched); // ✅ FIX: store in correct state
+                    setSimilarBooks(enriched);
                 }
             } catch (err) {
                 console.error("Error fetching book details:", err);
@@ -54,6 +65,7 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
 
         fetchDetails();
     }, [bookId]);
+
 
     if (loading || !data) {
         return <p className="text-white">Generating overview...</p>;
@@ -114,7 +126,7 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                         <dt className="text-white/50">Primary Thema Code</dt>
                         <dd className="text-white">{data.classification.primaryThema}</dd>
                     </div>
-                    {/* <div>
+                    {<div>
                         <dt className="text-white/50">Secondary Thema Codes</dt>
                         <dd className="space-y-1 mt-1">
                             {data.classification.secondaryThema.map((s: any, idx: number) => (
@@ -124,8 +136,8 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                                 </div>
                             ))}
                         </dd>
-                    </div> */}
-                    {/* <div>
+                    </div>}
+                    {<div>
                         <dt className="text-white/50">Qualifiers</dt>
                         <dd className="space-y-1 mt-1">
                             {data.classification.qualifiers.map((q: string, idx: number) => (
@@ -134,7 +146,7 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                                 </div>
                             ))}
                         </dd>
-                    </div> */}
+                    </div>}
                 </dl>
             </div>
 
@@ -147,7 +159,11 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                             <div
                                 key={idx}
                                 className="cursor-pointer transform hover:scale-105 transition-transform duration-200 bg-white/10 rounded-lg overflow-hidden"
-                                onClick={() => setSelectedCover(book.coverUrl ?? `${import.meta.env.VITE_API_URL}/covers/no_cover.png`)}
+                                onClick={() =>
+                                    setSelectedCover(
+                                        book.coverUrl ?? `${import.meta.env.VITE_API_URL}/covers/no_cover.png`
+                                    )
+                                }
                             >
                                 <div className="aspect-[3/4] relative">
                                     <img
@@ -157,9 +173,14 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                                     />
                                 </div>
                                 <div className="p-3 text-center">
-                                    <h3 className="text-sm font-semibold text-white mb-1 truncate">{book.title}</h3>
+                                    <h3 className="text-sm font-semibold text-white mb-1 truncate">
+                                        {book.title}
+                                    </h3>
                                     <p className="text-white/70 text-xs truncate">{book.author}</p>
                                     <p className="text-white/50 text-xs mt-1">{book.note}</p>
+                                    {book.isbn && (
+                                        <p className="text-white/40 text-[11px] mt-1">ISBN: {book.isbn}</p>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -180,6 +201,7 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                     )}
                 </div>
             )}
+
         </div>
     );
 };

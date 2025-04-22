@@ -11,6 +11,11 @@ interface Character {
     description: string;
 }
 
+interface Location {
+    location_name: string;
+    description: string;
+}
+
 interface AnalysisData {
     synopsis: string;
     impact: {
@@ -19,6 +24,7 @@ interface AnalysisData {
     };
     characters: Character[];
     chapters: Chapter[];
+    locations: Location[];
 }
 
 interface Props {
@@ -110,12 +116,24 @@ const AnalysisTab: React.FC<Props> = ({ bookId }) => {
             </div>
 
             <div className="bg-white/5 rounded-lg p-6">
-                <h3 className="text-xl font-semibold mb-4">Character Profiles</h3>
+                <h3 className="text-xl font-semibold mb-4">🔍 Character Profiles</h3>
                 <ul className="space-y-3">
                     {data.characters.map((character, index) => (
                         <div key={index} className="border-b border-white/10 pb-4">
                             <h4 className="font-medium mb-2">{character.character_name}</h4>
                             <p className="text-white/70">{character.description}</p>
+                        </div>
+                    ))}
+                </ul>
+            </div>
+
+            <div className="bg-white/5 rounded-lg p-6">
+                <h3 className="text-xl font-semibold mb-4">📍 Location Notes</h3>
+                <ul className="space-y-3">
+                    {data.locations.map((location, index) => (
+                        <div key={index} className="border-b border-white/10 pb-4">
+                            <h4 className="font-medium mb-2">{location.location_name}</h4>
+                            <p className="text-white/70">{location.description}</p>
                         </div>
                     ))}
                 </ul>

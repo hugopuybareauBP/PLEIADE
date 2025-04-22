@@ -6,10 +6,11 @@ import random as rd
 from backend.app.utils.llm import build_synopsis, build_time_period, build_genres, build_tone, build_keywords, build_comparison
 from backend.app.utils.key_data import build_key_data
 from backend.app.utils.thema_code import thema_code_pipeline
+from backend.app.utils.parsers import parse_keywords
 # Analysis imports
 from backend.app.utils.llm import build_impact_analysis, build_chapter_breakdown
-from backend.app.utils.parsers import parse_impact_analysis
 from backend.app.utils.profile_generation import profile_generation_pipeline
+from backend.app.utils.location_generation import location_note_pipeline
 # Marketing imports
 from backend.app.utils.llm import build_ecommerce_description, build_tweet
 from backend.app.utils.parsers import parse_ecommerce
@@ -25,8 +26,9 @@ def generate_analysis_components(book_id):
     chapter_breakdown = build_chapter_breakdown(chunks)
 
     analysis = {
-            "impact": parse_impact_analysis(build_impact_analysis(chapter_breakdown)),
+            "impact": parse_model_json_response(build_impact_analysis(chapter_breakdown)),
             "characters": profile_generation_pipeline(chapter_breakdown),
+            "locations": location_note_pipeline(chapter_breakdown),
             "chapters": chapter_breakdown 
         }
     
@@ -40,7 +42,7 @@ def generate_overview_components(book_id: str) -> dict:
     pages = load_book_pages(book_id)
     synopsis = build_synopsis(chapter_breakdown, title)
     text = load_book_text(book_id)
-    keywords = build_keywords(synopsis, chapter_breakdown)
+    keywords = parse_keywords(build_keywords(synopsis, chapter_breakdown))
 
     overview = {
         "synopsis": synopsis,

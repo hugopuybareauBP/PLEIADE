@@ -128,7 +128,71 @@ def build_character_profile(character_name: str, context: str) -> str:
     prompt = (
         f"Write a concise character profile for {character_name} using only the information below.\n"
         f"Return it as a JSON object like this:\n"
-        f'{{"character": "{character_name}", "description": "<context-based summary>"}}\n'
+        f'{{"character_name": "{character_name}", "description": "<context-based summary>"}}\n'
+        f"---\n{context}\n---"
+    )
+
+    response = client.chat.completions.create(
+        model=AZURE_OPENAI_MODEL_NAME,
+        messages=[
+            {"role": "system", "content": "You are a literary analyst."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2,
+        max_tokens=1024
+    )
+
+    return response.choices[0].message.content
+
+# Location note generation
+
+def build_location_candidates_from_chunk(text: str) -> str:
+    prompt = (
+        f"Extract the names of fictional or real locations explicitly mentioned in this book excerpt.\n"
+        f"Include cities, buildings, landmarks, regions, and notable places. Exclude vague terms like 'the house' or 'the village'.\n"
+        f"Return them as a bullet list.\n\n"
+        f"{text}"
+    )
+
+    response = client.chat.completions.create(
+        model=AZURE_OPENAI_MODEL_NAME,
+        messages=[
+            {"role": "system", "content": "You are a professional literary analyst."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.1,
+        max_tokens=2048
+    )
+
+    return response.choices[0].message.content
+
+def build_top_locations(unique_locations: List[str], n: int = 10) -> str:
+    prompt = (
+        f"Here is a list of locations from a book:\n\n"
+        + "\n".join(f"- {name}" for name in unique_locations) +
+        f"\n\nClean this list by:\n"
+        f"- Merging duplicate locations (e.g., 'Core chamber' and 'Core')\n"
+        f"- Removing generic or non-informative entries\n"
+        f"- Returning at most {n} of the most important locations as a bullet list only.\n"
+    )
+
+    response = client.chat.completions.create(
+        model=AZURE_OPENAI_MODEL_NAME,
+        messages=[
+            {"role": "system", "content": "You are a professional book analyst."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.1,
+        max_tokens=1024
+    )
+
+    return response.choices[0].message.content
+
+def build_location_note(location_name: str, context: str) -> str:
+    prompt = (
+        f"Write a short note about the location '{location_name}' using only the information below.\n"
+        f"Return it as a JSON object like this:\n"
+        f'{{"location_name": "{location_name}", "description": "<context-based summary>"}}\n'
         f"---\n{context}\n---"
     )
 
@@ -222,9 +286,9 @@ def build_synopsis(chapter_breakdown, title) -> str: # First 5 chapters though
 
     return response.choices[0].message.content
 
-def build_time_period(synopsis, summaries):
+def build_time_period(synopsis, chapter_breakdown):
     print(f"[BUILD_TIME_PERIOD] Building time period...")
-    context = "\n".join(summaries[:5])
+    context = "\n".join([c["raw_output"] for c in chapter_breakdown[:3]])
 
     prompt = (
         f"Based on the synopsis and chapters below, identify the time period covered by the book (e.g., 'Present day', '2030-2045', '19th century to now').\n"
@@ -304,7 +368,7 @@ def build_keywords(synopsis, chapter_breakdown):
         f"Based on the synopsis and chapters below, identify 8 keywords that best represent the book.\n"
         f"Consider themes, and any other relevant details.\n"
         f"DO NOT INCLUDE CHARACTER NAMES.\n"
-        f"**Just give 8 keywords, separated by commas. Do not make a sentence or add any other words/number.**\n\n"
+        f"**Just give 8 keywords in a list, separated by commas : Keyword1, Keyword2, .... Do not make a sentence or add any other words/number.**\n\n"
         f"Synopsis:\n{synopsis}\n\n"
         f"Chapter summaries:\n{context}"
     )
@@ -367,7 +431,6 @@ def build_2nd_letter_thema_code(synopsis, prompt):
     response = client.chat.completions.create(
         model=AZURE_OPENAI_MODEL_NAME,
         messages=[
-            {"role": "system", "content": "You are a book classification assistant."},
             {"role": "user", "content": prompt}
         ],
         temperature=0.1,
