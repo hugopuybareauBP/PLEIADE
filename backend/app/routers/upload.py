@@ -11,7 +11,7 @@ from backend.app.storage.storage import (
     save_book, load_books, save_book_details,
     save_cover_image, load_book_details
 )
-from backend.app.utils.preprocessing import preprocessing_pipeline
+from backend.app.utils.preprocessing.preprocessing import preprocessing_pipeline
 
 enc = tiktoken.get_encoding("cl100k_base")
 
