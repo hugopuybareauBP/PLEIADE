@@ -64,6 +64,7 @@ async def upload_file(
         raise HTTPException(status_code=500, detail=str(e))
 
     book_id = secrets.token_hex(4)
+    # book_id = "demo" # For demo purposes, using a fixed ID
     cover_url = ""
     if cover:
         cover_bytes = await cover.read()
