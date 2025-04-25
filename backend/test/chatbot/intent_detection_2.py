@@ -1,19 +1,24 @@
-#backend/test/chatbot/intent_detection.py
+# backend/tests/chatbot/intent_detection_2.py
 
 import os
 
-from openai import AzureOpenAI
+from langchain_openai import AzureChatOpenAI
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema.output_parser import StrOutputParser
 
-# Azure OpenAI Configuration
+# --- Azure OpenAI Configuration ---
 api_version = "2024-12-01-preview"
 AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_OPENAI_MODEL_NAME = os.getenv("AZURE_OPENAI_MODEL_NAME")
 
-client = AzureOpenAI(
+llm = AzureChatOpenAI(
     api_key=AZURE_OPENAI_API_KEY,
     azure_endpoint=AZURE_OPENAI_ENDPOINT,
     api_version=api_version,
+    deployment_name=AZURE_OPENAI_MODEL_NAME,
+    temperature=0.1,
+    max_tokens=50
 )
 
 INTENT_CATEGORIES = {
@@ -26,28 +31,35 @@ INTENT_CATEGORIES = {
     "OTHER": "Questions that do not fit into the above categories or cannot be answered due to lack of context or relevance."
 }
 
+PLOT_CATEGORIES = { 
+    "PLOT_BY_CHAPTER_X": "The user explicitly refers to a specific chapter number 'X'. Replace X with the number.",
+    "PLOT_BY_POSITION_X": "The user refers to a part of the book. Replace X with 'beginning', 'middle', or 'end' according to the meaning of the query.",
+    "PLOT_SEMANTIC": "The question is about plot content without reference to structure or position."
+}
+
+# --- Prompt Template ---
+prompt_template = ChatPromptTemplate.from_template(
+    """
+    Classify the following user question into one of these categories:\n
+    {categories}\n
+    Respond with only the category name.\n
+    Question: {question}
+    """
+)
+
+intent_categories_text = "\n".join(f"{key}: {desc}" for key, desc in INTENT_CATEGORIES.items())
+plot_categories_text = "\n".join(f"{key}: {desc}" for key, desc in PLOT_CATEGORIES.items())
+
+intent_chain = prompt_template | llm | StrOutputParser()
+
 def detect_intent(question: str) -> str:
-    prompt = (
-        f"Classify the following user question into one of these categories:"
-        f"{chr(10).join(f"{key}: {desc}" for key, desc in INTENT_CATEGORIES.items())}\n"
-        f"Respond with only the category name.\n"
-        f"Question: {question}\n"
-    )
+    intent = intent_chain.invoke({"categories": intent_categories_text, "question": question}).strip()
+    if intent == "PLOT":
+        intent = intent_chain.invoke({"categories": plot_categories_text, "question": question}).strip()
+    return intent
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You classify queries of users to manage a retrieval system."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=50
-    )
-    
-    return response.choices[0].message.content
-
+# --- CLI Test ---
 if __name__ == '__main__':
-    # question = "What is the main character's motivation in the story?"
-    question = "What is the purpose of Paul in the story?"
+    question = "Is this book good for children?"
     intent = detect_intent(question)
     print(f"Detected intent: {intent}")
