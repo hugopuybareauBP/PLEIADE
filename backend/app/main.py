@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from backend.app.routers import upload # UploadPage
 from backend.app.routers import book_details # BookDetailsPage
 from backend.app.routers import chatbot # ChatStreamPage
+from backend.app.routers import dashboard # DashboardPage
 
 app = FastAPI(
     title="My Book Analyzer",
@@ -37,6 +38,7 @@ app.add_middleware(
 app.include_router(upload.router)
 app.include_router(book_details.router)
 app.include_router(chatbot.router)
+app.include_router(dashboard.router)
 
 if __name__ == "__main__":
     uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)
