@@ -60,6 +60,16 @@ def load_book_title(book_id: str) -> dict:
 
     raise ValueError(f"No book found with ID {book_id}")
 
+def load_book_author(book_id: str) -> dict:
+    with open(BOOKS_UPLOADPAGE_FILE, "r", encoding="utf-8") as f:
+        books = json.load(f)
+
+    for book in books:
+        if book["id"] == book_id:
+            return book.get("author", "")
+
+    raise ValueError(f"No book found with ID {book_id}")
+
 def load_book_pages(book_id: str) -> dict:
     with open(BOOKS_UPLOADPAGE_FILE, "r", encoding="utf-8") as f:
         books = json.load(f)
@@ -88,8 +98,8 @@ def get_book_path(book_id: str) -> str:
 
 # BOOKS OVERVIEW METHODS
 
-def get_2nd_letter_thema_code_prompt(primary_thema_code):
-    file_path = "backend/app/storage/thema_codes/secondary_thema_prompts.json"
+def get_2nd_letter_prompt(primary_thema_code):
+    file_path = "backend/app/storage/thema_codes/2nd_letter_prompts.json"
     try:
         with open(file_path, "r") as f:
             prompts = json.load(f)
@@ -99,14 +109,31 @@ def get_2nd_letter_thema_code_prompt(primary_thema_code):
     except json.JSONDecodeError:
         return "Error reading JSON file. Please ensure it is properly formatted."
     
-def get_thema_code_desc(thema_code):
-    file_path = "backend/app/storage/thema_codes/thema_lookup.json"
+def get_3rd_letter_prompt(second_letter):
+    file_path = "backend/app/storage/thema_codes/3rd_letter_prompts.json"
     try:
         with open(file_path, "r") as f:
-            data = json.load(f)
-        return data.get(thema_code.strip().upper(), f"No text found for code '{thema_code}'")
+            prompts = json.load(f)
+        return prompts.get(second_letter.strip().upper(), f"No prompt found for 2nd letter '{second_letter}'")
     except FileNotFoundError:
         return f"File '{file_path}' not found."
     except json.JSONDecodeError:
         return "Error reading JSON file. Please ensure it is properly formatted."
+    
+def get_thema_code_desc(code_value):
+    file_path = "backend/app/storage/thema_codes/thema_codes.json"
+    try:
+        with open(file_path, "r") as f:
+            thema_json = json.load(f)
+    except FileNotFoundError:
+        return f"File '{file_path}' not found."
+    except json.JSONDecodeError:
+        return "Error reading JSON file. Please ensure it is properly formatted."
+    codes = thema_json.get("CodeList", {}).get("ThemaCodes", {}).get("Code", [])
+    
+    for code_entry in codes:
+        if code_entry.get("CodeValue") == code_value:
+            return code_entry.get("CodeDescription")
+    return None
+
 
