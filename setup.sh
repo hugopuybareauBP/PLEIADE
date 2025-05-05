@@ -14,7 +14,7 @@ fi
 echo "📦 Installing backend dependencies from requirements.txt..."
 source env_pleiade/bin/activate
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 deactivate
 
 # Step 3: Install frontend dependencies
