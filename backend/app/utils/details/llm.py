@@ -1,461 +1,270 @@
 # backend/app/generation/llm.py
 
-import os
-
 from typing import List
-from openai import AzureOpenAI
+from backend.app.utils.details.llm_core import call_llm
+from backend.app.utils.details.parsers import parse_model_json_response
 
-# Azure OpenAI Configuration
-api_version = "2024-12-01-preview"
-AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
-AZURE_OPENAI_MODEL_NAME = os.getenv("AZURE_OPENAI_MODEL_NAME")
+### CHAPTER SUMMARIZATION ###
 
-client = AzureOpenAI(
-    api_key=AZURE_OPENAI_API_KEY,
-    azure_endpoint=AZURE_OPENAI_ENDPOINT,
-    api_version=api_version,
-)
+def summarize_chunk(chunk_text: str, chunk_id: int) -> dict:
+    prompt = f"""
+            You are a helpful assistant tasked with summarizing a passage from a book.
 
-### ANALYSIS DETAILS ###
+            1. Summarize the passage in a concise paragraph of approximately 100 words.
+            2. Then suggest a short, relevant chapter title (max 8 words), based only on the content.
+            3. Do NOT invent characters, places, or context. If the passage is too vague to name a title, return an empty string "" as the title.
+            4. Your output must be a JSON object like this:
+            {{
+                "raw_output": "...",
+                "suggested_title": "..."
+            }}
 
-def summarize_chunk_with_mistral(chunk_text: str, chunk_id: int) -> dict:
+            Here is the passage:
+            ---
+            {chunk_text}
+            ---
+            """
+    content = call_llm("You are a helpful summarization assistant.", prompt)
     
-    prompt = (
-        f"Summarize the following book passage into a concise 100 word text.\n"
-        f"- Skip any generic introduction or explanations about the book, chapter or the author.\n"
-        f"- Focus on what happens, key characters, or any important developments.\n"
-        f"- Summarize this chapter based only on the provided text."
-        f"- Do not invent characters or settings. If the text is vague, keep the summary general."
-        f" {chunk_text}\n\n"
-    )
-
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a helpful summarization assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
+    try:
+        parsed = parse_model_json_response(content)
+    except Exception:
+        parsed = {
+            "raw_output": content.strip(),
+            "suggested_title": ""
+        }
 
     return {
-        "chapter_name": f"Chapter {chunk_id+1}",
-        "raw_output": response.choices[0].message.content
+        "chapter_name": f"Chapter {chunk_id + 1}",
+        "raw_output": parsed.get("raw_output", "").strip(),
+        "suggested_title": parsed.get("suggested_title", "").strip()
     }
 
 def build_chapter_breakdown(chunks) -> dict:
-
-    chapter_breakdown = []
-
-    for id, chunk in enumerate(chunks):
-        print(f"[BUILD_CHAPTER_BREAKDOWN] Summarizing chunk {id}...")
-        summary = summarize_chunk_with_mistral(chunk, id)
-        chapter_breakdown.append(summary)
-
-    return chapter_breakdown
+    return [summarize_chunk(chunk, i) for i, chunk in enumerate(chunks)]
 
 def build_impact_analysis(chapter_breakdown) -> str:
-    print(f"[BUILD_IMPACT_ANALYSIS] Building impact analysis...")
     context = "\n".join([c["raw_output"] for c in chapter_breakdown])
+    prompt = f"""
+            Based on the chapter summaries below, write a list of 5 strengths and 5 weaknesses for this book.
+            Focus on writing style, structure, clarity, examples, and depth of content.
+            Respond with valid **minified JSON** ONLY. Do not include markdown, no explanations, no labels.
+            Format:
+            {{"strengths": ["..."], "weaknesses": ["..."]}}
 
-    prompt = (
-        f"Based on the chapter summaries below, write a list of 5 strengths and 5 weaknesses for this book.\n"
-        f"Focus on writing style, structure, clarity, examples, and depth of content.\n\n"
-        f"Respond with valid **minified JSON** ONLY. Do not include markdown, no explanations, no labels.\n"
-        "Format:\n{\"strengths\": [\"...\"], \"weaknesses\": [\"...\"]}\n\n"
-        f"Chapter summaries:\n{context}"
-    )
+            Chapter summaries:
+            {context}
+            """
+    return call_llm("You are a professional book analyst.", prompt)
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a professional book analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
+### CHARACTER GENERATION ###
 
-    return response.choices[0].message.content
+def build_character_candidates_from_chunk(text: str) -> str:
+    prompt = f"""
+            Extract the full names of fictional characters explicitly mentioned in this book excerpt.
+            Only include clearly named characters (no pronouns, vague roles, or invented names).
+            Return as a bullet list.
 
-# Character profile generation
-
-def build_character_candidates_from_chunk(text: str) -> List[str]:
-    prompt = (
-        f"Extract the full names of fictional characters explicitly mentioned in this book excerpt.\n"
-        f"Only include clearly named characters (no pronouns, vague roles, or invented names).\n"
-        f"Return as a bullet list.\n\n"
-        f"{text}"
-    )
-
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a professional literary analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=2048
-    )
-
-    return response.choices[0].message.content
+            {text}
+            """
+    return call_llm("You are a professional literary analyst.", prompt)
 
 def build_top_characters(unique_candidates: List[str], n: int = 10) -> str:
-    prompt = (
-        f"Here is a list of character names from a book:\n\n"
-        + "\n".join(f"- {name}" for name in unique_candidates) +
-        f"\n\nClean this list by:\n"
-        f"- Merging duplicate names (e.g., 'The Hatter' and 'Mad Hatter')\n"
-        f"- Removing generic or non-informative entries\n"
-        f"- Returning at most {n} of the most important characters as a bullet list only.\n"
-    )
+    prompt = f"""
+            Here is a list of character names from a book:
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a professional book analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=1024
-    )
+            {chr(10).join(f"- {name}" for name in unique_candidates)}
 
-    return response.choices[0].message.content
+            Clean this list by:
+            - Merging duplicate names (e.g., 'The Hatter' and 'Mad Hatter')
+            - Removing generic or non-informative entries
+            - Returning at most {n} of the most important characters as a bullet list only.
+            """
+    return call_llm("You are a professional book analyst.", prompt)
 
 def build_character_profile(character_name: str, context: str) -> str:
-    prompt = (
-        f"Write a concise character profile for {character_name} using only the information below.\n"
-        f"Return it as a JSON object like this:\n"
-        f'{{"character_name": "{character_name}", "description": "<context-based summary>"}}\n'
-        f"---\n{context}\n---"
-    )
+    prompt = f"""
+            Write a concise character profile for {character_name} using only the information below.
+            Return it as a JSON object like this:
+            {{"character_name": "{character_name}", "description": "<context-based summary>"}}
+            ---
+            {context}
+            ---
+            """
+    return call_llm("You are a literary analyst.", prompt, temperature=0.2)
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a literary analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.2,
-        max_tokens=1024
-    )
-
-    return response.choices[0].message.content
-
-# Location note generation
+### LOCATION GENERATION ###
 
 def build_location_candidates_from_chunk(text: str) -> str:
-    prompt = (
-        f"Extract the names of fictional or real locations explicitly mentioned in this book excerpt.\n"
-        f"Include cities, buildings, landmarks, regions, and notable places. Exclude vague terms like 'the house' or 'the village'.\n"
-        f"Return them as a bullet list.\n\n"
-        f"{text}"
-    )
+    prompt = f"""
+            Extract the names of fictional or real locations explicitly mentioned in this book excerpt.
+            Include cities, buildings, landmarks, regions, and notable places. Exclude vague terms like 'the house' or 'the village'.
+            Return them as a bullet list.
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a professional literary analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=2048
-    )
-
-    return response.choices[0].message.content
+            {text}
+            """
+    return call_llm("You are a professional literary analyst.", prompt)
 
 def build_top_locations(unique_locations: List[str], n: int = 10) -> str:
-    prompt = (
-        f"Here is a list of locations from a book:\n\n"
-        + "\n".join(f"- {name}" for name in unique_locations) +
-        f"\n\nClean this list by:\n"
-        f"- Merging duplicate locations (e.g., 'Core chamber' and 'Core')\n"
-        f"- Removing generic or non-informative entries\n"
-        f"- Returning at most {n} of the most important locations as a bullet list only.\n"
-    )
+    prompt = f"""
+            Here is a list of locations from a book:
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a professional book analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=1024
-    )
+            {chr(10).join(f"- {name}" for name in unique_locations)}
 
-    return response.choices[0].message.content
+            Clean this list by:
+            - Merging duplicate locations (e.g., 'Core chamber' and 'Core')
+            - Removing generic or non-informative entries
+            - Returning at most {n} of the most important locations as a bullet list only.
+            """
+    return call_llm("You are a professional book analyst.", prompt)
 
 def build_location_note(location_name: str, context: str) -> str:
-    prompt = (
-        f"Write a short note about the location '{location_name}' using only the information below.\n"
-        f"Return it as a JSON object like this:\n"
-        f'{{"location_name": "{location_name}", "description": "<context-based summary>"}}\n'
-        f"---\n{context}\n---"
-    )
+    prompt = f"""
+            Write a short note about the location '{location_name}' using only the information below.
+            Return it as a JSON object like this:
+            {{"location_name": "{location_name}", "description": "<context-based summary>"}}
+            ---
+            {context}
+            ---
+            """
+    return call_llm("You are a literary analyst.", prompt, temperature=0.2)
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a literary analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.2,
-        max_tokens=1024
-    )
+### MARKETING ###
 
-    return response.choices[0].message.content
+def build_ecommerce_description(synopsis: str, title: str) -> str:
+    prompt = f"""
+            Here is a short synopsis of the book:
+            {synopsis}
 
-### MARKETING DETAILS ###
+            Based on this, return a compelling and professional product description as a JSON object with this format:
+            {{
+              "description": ["A strong, attention-grabbing hook", "Followed by a few short, exciting sentences summarizing the book"],
+              "bullets": ["Key takeaway 1", "Key takeaway 2", "Key takeaway 3"],
+              "closing": "A persuasive sentence encouraging the user to buy the book."
+            }}
 
-def build_ecommerce_description(synopsis: str, title) -> str:
-    prompt = (
-        f"Here is a short synopsis of the book:\n"
-        f"{synopsis}\n\n"
-        f"Based on this, return a compelling and professional product description as a JSON object with this format:\n"
-        f"{{\n"
-        f"  \"description\": [\"A strong, attention-grabbing hook\", \"Followed by a few short, exciting sentences summarizing the book\"],\n"
-        f"  \"bullets\": [\"Key takeaway 1\", \"Key takeaway 2\", \"Key takeaway 3\"],\n"
-        f"  \"closing\": \"A persuasive sentence encouraging the user to buy the book.\"\n"
-        f"}}\n\n"
-        f"Make it exciting and accessible like something found on Amazon. Do NOT include markdown or explanations outside the JSON."
-    )
+            Make it exciting and accessible like something found on Amazon. Do NOT include markdown or explanations outside the JSON.
+            """
+    return call_llm("You are a professional copywriter creating an e-commerce book description.", prompt)
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a professional copywriter creating an e-commerce book description."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
+def build_tweet(synopsis: str) -> str:
+    prompt = f"""
+            Based on the following synopsis, generate a tweet that promotes the book.
 
-    return response.choices[0].message.content
+            Synopsis:
+            {synopsis}
 
-def build_tweet(synopsis) -> str:
-    prompt = (
-        f"Based on the following synopsis, generate a tweet that promote the book with the following synopsis.\n\n"
-        f"Synopsis:\n{synopsis}\n\n"
-        f"The tweet should be punchy, engaging, and fit within 280 characters. "
-        f"Use a witty, modern tone. Finish with 3 different hashtags and don't mention AI or that it is based on a summary.\n"
-    )
+            The tweet should be punchy, engaging, and fit within 280 characters. 
+            Use a witty, modern tone. Finish with 3 different hashtags and don't mention AI or that it is based on a summary.
+            """
+    return call_llm("You are a social media content writer for a publishing house.", prompt, temperature=0.6)
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a social media content writer for a publishing house."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.6,
-        max_tokens=4096
-    )
+### OVERVIEW & META ###
 
-    return response.choices[0].message.content
-
-### OVERVIEW DETAILS ###
-
-def build_synopsis(chapter_breakdown, title) -> str: # First 5 chapters though
-    print(f"[BUILD_SYNOPSIS] Building synopsis...")
+def build_synopsis(chapter_breakdown, title: str) -> str:
     context = "\n".join([c["raw_output"] for c in chapter_breakdown[:5]])
-     
-    prompt = (
-        f"Book title: '{title}'\n\n"
-        f"Below are key points and chapter-level summaries extracted from the book:\n\n"
-        f"{context}\n\n"
-        f"Using ONLY this information, write a polished 2–3 sentence synopsis in the style of a book jacket blurb.\n"
-        f"The synopsis should:\n"
-        f"- Capture the essence and themes of the book\n"
-        f"- Sound professional and high-level (not like a chapter summary)\n"
-        f"- Avoid bullet points and lists\n"
-        f"- Be suitable for an e-commerce product page or publisher's back cover\n"
-        f"- Do not mention summaries or chapters\n"
-    )
+    prompt = f"""
+            Book title: '{title}'
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a professional editor writing a short synopsis for a book."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
+            Below are key points and chapter-level summaries extracted from the book:
 
-    return response.choices[0].message.content
+            {context}
+
+            Using ONLY this information, write a polished 2–3 sentence synopsis in the style of a book jacket blurb.
+            - Capture the essence and themes of the book
+            - Sound professional and high-level (not like a chapter summary)
+            - Avoid bullet points and lists
+            - Be suitable for an e-commerce product page or publisher's back cover
+            - Do not mention summaries or chapters
+            """
+    return call_llm("You are a professional editor writing a short synopsis for a book.", prompt)
 
 def build_time_period(synopsis, chapter_breakdown):
-    print(f"[BUILD_TIME_PERIOD] Building time period...")
     context = "\n".join([c["raw_output"] for c in chapter_breakdown[:3]])
+    prompt = f"""
+            Based on the synopsis and chapters below, identify the time period covered by the book (e.g., 'Present day', '2030-2045', '19th century to now').
+            Consider historical events, cultural references, and any other relevant details.
+            The output should be maximum 10 words.
 
-    prompt = (
-        f"Based on the synopsis and chapters below, identify the time period covered by the book (e.g., 'Present day', '2030-2045', '19th century to now').\n"
-        f"Consider historical events, cultural references, and any other relevant details.\n"
-        f"The output should be maximum 10 words.\n\n"
-        f"Synopsis:\n{synopsis}\n\n"
-        f"Chapter summaries:\n{context}"
-    )
+            Synopsis:
+            {synopsis}
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a book publishing assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
-
-    return response.choices[0].message.content
+            Chapter summaries:
+            {context}
+            """
+    return call_llm("You are a book publishing assistant.", prompt)
 
 def build_genres(synopsis, chapter_breakdown):
-    print(f"[BUILD_GENRES] Building genres...")
     context = "\n".join([c["raw_output"] for c in chapter_breakdown[:5]])
+    prompt = f"""
+            Based on the synopsis and chapters below, identify the genres of the book (e.g., 'Science Fiction', 'Romance', 'Historical Fiction').
+            **Just give 3 genres, separated by commas. e.g ("Technology, Business, Future Studies"). Do not make a sentence.**
 
-    prompt = (
-        f"Based on the synopsis and chapters below, identify the genres of the book (e.g., 'Science Fiction', 'Romance', 'Historical Fiction').\n"
-        f"Consider themes, characters, and any other relevant details.\n"
-        f"**Just give 3 genres, separated by commas. e.g (\"Technology, Business, Future Studies\").\n"
-        f"Do not make a sentence or add any words.**\n\n"
-        f"Synopsis:\n{synopsis}\n\n"
-        f"Chapter summaries:\n{context}"
-    )
+            Synopsis:
+            {synopsis}
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a professional book analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
-
-    return response.choices[0].message.content
+            Chapter summaries:
+            {context}
+            """
+    return call_llm("You are a professional book analyst.", prompt)
 
 def build_tone(synopsis, chapter_breakdown):
-    print(f"[BUILD_TONE] Building tone...")
     context = "\n".join([c["raw_output"] for c in chapter_breakdown[:3]])
+    prompt = f"""
+            Based on the synopsis and chapters below, identify the tone of the book (e.g., 'Serious', 'Humorous', 'Dark').
+            **Just give 3 tones, separated by commas. Do not make a sentence.**
 
-    prompt = (
-        f"Based on the synopsis and chapters below, identify the tone of the book (e.g., 'Serious', 'Humorous', 'Dark').\n"
-        f"Consider writing style, character interactions, and any other relevant details.\n"
-        f"**Just give 3 tones, separated by commas. e.g (\"Informative, Optimistic, Balanced\").\n"
-        f"Do not make a sentence or add any other words/number.**\n\n"
-        f"Synopsis:\n{synopsis}\n\n"
-        f"Chapter summaries:\n{context}"
-    )
-    
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a professional book analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
+            Synopsis:
+            {synopsis}
 
-    return response.choices[0].message.content
+            Chapter summaries:
+            {context}
+            """
+    return call_llm("You are a professional book analyst.", prompt)
 
 def build_keywords(synopsis, chapter_breakdown):
-    print(f"[BUILD_KEYWORDS] Building keywords...")
     context = "\n".join([c["raw_output"] for c in chapter_breakdown[:3]])
+    prompt = f"""
+            Based on the synopsis and chapters below, identify 8 keywords that best represent the book.
+            **Just give 8 keywords in a list, separated by commas. Do NOT include character names.**
 
-    prompt = (
-        f"Based on the synopsis and chapters below, identify 8 keywords that best represent the book.\n"
-        f"Consider themes, and any other relevant details.\n"
-        f"DO NOT INCLUDE CHARACTER NAMES.\n"
-        f"**Just give 8 keywords in a list, separated by commas : Keyword1, Keyword2, .... Do not make a sentence or add any other words/number.**\n\n"
-        f"Synopsis:\n{synopsis}\n\n"
-        f"Chapter summaries:\n{context}"
-    )
+            Synopsis:
+            {synopsis}
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a professional book analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
+            Chapter summaries:
+            {context}
+            """
+    return call_llm("You are a professional book analyst.", prompt)
 
-    return response.choices[0].message.content
+def build_1st_letter(synopsis):
+    prompt = f"""
+            Your task is to assign the correct primary Thema code (only the first letter) to the following book, based on its synopsis.
 
-def build_1st_letter_thema_code(synopsis):
-    prompt = (
-        f"Your task is to assign the correct primary Thema code (only the first letter) to the following book, based on its synopsis.\n\n"
-        f"Choose ONE of the following Thema codes:\n"
-        f"A - The Arts\n"  
-        f"C - Language and Linguistics\n" 
-        f"D - Biography, Literature and Literary studies\n"  
-        f"F - Fiction\n"  
-        f"G - Reference, Information and Interdisciplinary subjects\n"  
-        f"J - Society and Social Sciences\n"  
-        f"K - Economics, Finance, Business and Management\n"  
-        f"L - Law\n"  
-        f"M - Medicine and Nursing\n"  
-        f"N - History and Archaeology\n"  
-        f"P - Mathematics and Science\n"  
-        f"Q - Philosophy\n"  
-        f"R - Earth Sciences, Geography, Environment, Planning\n"  
-        f"S - Sports and Active outdoor recreation\n"  
-        f"T - Technology, Engineering, Agriculture, Industrial processes\n"  
-        f"U - Computing and Information Technology\n"  
-        f"V - Health, Relationships and Personal development\n"  
-        f"W - Lifestyle, Hobbies and Leisure\n"  
-        f"X - Graphic novels, Comic books, Manga, Cartoons\n"  
-        f"Y - Children’s, Teenage and Educational\n\n"
-        f"Return ONLY the code (e.g. \"F\", \"Q\", etc.).\n"
-        f"Here is the synopsis of the book:\n\n"
-        f"{synopsis}"
-    )
+            Choose ONE of the following Thema codes:
+            A - The Arts, C - Language, D - Literature, F - Fiction, G - Reference, J - Society, K - Economics,
+            L - Law, M - Medicine, N - History, P - Science, Q - Philosophy, R - Geography, S - Sports,
+            T - Technology, U - Computing, V - Personal Development, W - Lifestyle, X - Graphic Novels, Y - Youth
 
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a book classification assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
+            Return ONLY the code (e.g. "F", "Q", etc.).
 
-    return response.choices[0].message.content
+            Here is the synopsis of the book:
+            {synopsis}
+            """
+    return call_llm("You are a book classification assistant.", prompt)
 
-def build_2nd_letter_thema_code(synopsis, prompt):
-    prompt += synopsis
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
-
-    return response.choices[0].message.content
+def build_next_letter(synopsis, base_prompt):
+    return call_llm("You are a book classification assistant.", base_prompt + synopsis)
 
 def build_comparison(synopsis, keywords):
-    prompt = (
-        f"Based on the synopsis and the keywords below, suggest 5 books that are similar in content, themes and audience.\n"
-        f"Return the response in JSON format with the following structure:\n"
-        f"[{{\"author\": \"Author Name\", \"title\": \"Book Title\", \"note\": \"Short note about the book\"}}, ...]\n\n"
-        f"Synopsis:\n{synopsis}\n\n"
-        f"Keywords:\n{keywords}\n\n"
-    )
-    
-    response = client.chat.completions.create(
-        model=AZURE_OPENAI_MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a book classification assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.1,
-        max_tokens=4096
-    )
+    prompt = f"""
+            Based on the synopsis and the keywords below, suggest 5 books that are similar in content, themes and audience.
+            Return the response in JSON format with the following structure:
+            [{{"author": "Author Name", "title": "Book Title", "note": "Short note about the book"}}, ...]
 
-    return response.choices[0].message.content
+            Synopsis:
+            {synopsis}
+
+            Keywords:
+            {keywords}
+            """
+    return call_llm("You are a book classification assistant.", prompt)
