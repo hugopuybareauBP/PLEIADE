@@ -43,6 +43,7 @@ def generate_overview_components(book_id: str) -> dict:
     synopsis = build_synopsis(chapter_breakdown, title)
     text = load_book_text(book_id)
     keywords = parse_keywords(build_keywords(synopsis, chapter_breakdown))
+    primary_thema, secondary_thema = thema_code_pipeline(synopsis)
 
     overview = {
         "synopsis": synopsis,
@@ -54,12 +55,8 @@ def generate_overview_components(book_id: str) -> dict:
             "keywords": keywords,
         },
         "classification": {
-            "primaryThema": thema_code_pipeline(synopsis),
-            "secondaryThema": [
-                {"code": "UBJ", "label": "Impact of AI on social connections"},
-                {"code": "KJM", "label": "AI in business strategy"},
-                {"code": "PDR", "label": "Societal implications"}
-            ],
+            "primaryThema": primary_thema,
+            "secondaryThema": secondary_thema,
             "qualifiers": [
                 "4SP (For professional/vocational reference)",
                 "4G (Research & development)"
