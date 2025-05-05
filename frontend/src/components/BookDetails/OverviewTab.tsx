@@ -126,7 +126,7 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                         <dt className="text-white/50">Primary Thema Code</dt>
                         <dd className="text-white">{data.classification.primaryThema}</dd>
                     </div>
-                    {/* {<div>
+                    <div>
                         <dt className="text-white/50">Secondary Thema Codes</dt>
                         <dd className="space-y-1 mt-1">
                             {data.classification.secondaryThema.map((s: any, idx: number) => (
@@ -136,8 +136,8 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                                 </div>
                             ))}
                         </dd>
-                    </div>}
-                    {<div>
+                    </div>
+                    {/* <div>
                         <dt className="text-white/50">Qualifiers</dt>
                         <dd className="space-y-1 mt-1">
                             {data.classification.qualifiers.map((q: string, idx: number) => (
@@ -146,7 +146,7 @@ const OverviewTab = ({ bookId }: OverviewTabProps) => {
                                 </div>
                             ))}
                         </dd>
-                    </div>} */}
+                    </div> */}
                 </dl>
             </div>
 

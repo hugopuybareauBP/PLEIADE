@@ -4,6 +4,7 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 interface Chapter {
     chapter_name: string;
     raw_output: string;
+    suggested_title: string;
 }
 
 interface Character {
@@ -107,7 +108,7 @@ const AnalysisTab: React.FC<Props> = ({ bookId }) => {
                                 {index + 1}
                             </span>
                             <div>
-                                <h4 className="font-medium">{chapter.chapter_name}</h4>
+                                <h4 className="font-medium">{chapter.suggested_title || chapter.chapter_name}</h4>
                                 <p className="text-white/70 text-sm mt-1">{chapter.raw_output}</p>
                             </div>
                         </div>

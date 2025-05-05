@@ -2,6 +2,7 @@ import OverviewTab from './OverviewTab';
 import AnalysisTab from './AnalysisTab';
 import MarketingTab from './MarketingTab';
 import ChatTab from './ChatTab';
+import DashboardTab from './DashboardTab';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -30,7 +31,7 @@ const tabs = [
     { id: 'analysis', label: 'Detailed Analysis', icon: BarChart2 },
     { id: 'marketing', label: 'Marketing', icon: Share2 },
     { id: 'chat', label: 'AI Chat', icon: MessageSquare },
-    // { id: 'audio', label: 'Audio', icon: Headphones },
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart2 },
 ];
 
 const BookDetails = ({ book, onBack }: BookDetailsProps) => {
@@ -57,7 +58,7 @@ const BookDetails = ({ book, onBack }: BookDetailsProps) => {
             case 'analysis': return <AnalysisTab bookId={book.id} />;
             case 'marketing': return <MarketingTab bookId={book.id} />;
             case 'chat': return <ChatTab bookId={book.id} />;
-            // case 'audio': return <AudioTab book={book} />;
+            case 'dashboard': return <DashboardTab bookId={book.id} />;
             default:
                 return null;
         }
