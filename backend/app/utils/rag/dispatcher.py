@@ -5,6 +5,8 @@ from backend.app.utils.rag.retrievers.character import character_retriever
 from backend.app.utils.rag.retrievers.marketing import marketing_retriever
 from backend.app.utils.rag.retrievers.places import places_retriever
 from backend.app.utils.rag.retrievers.plot import plot_retriever
+from backend.app.utils.rag.retrievers.outside import outside_retriever
+from backend.app.utils.rag.retrievers.other import other_retriever
 
 def retrieve_context(question: str, book_id: str, intent: str):
     if intent.startswith("CHARACTER"):
@@ -17,5 +19,9 @@ def retrieve_context(question: str, book_id: str, intent: str):
         return analysis_retriever(book_id, question)
     elif intent == "MARKETING":
         return marketing_retriever(book_id, question)
+    elif intent == "OUTSIDE":
+        return outside_retriever(book_id, question)
+    elif intent == "OTHER":
+        return other_retriever(book_id)
     else:
         return []

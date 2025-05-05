@@ -1,9 +1,7 @@
-# backend/app/utils/chatbot/ask.py
+# backend/app/utils/chatbot/llm.py
 
 import os
 
-from langchain.schema.output_parser import StrOutputParser
-from langchain.prompts import ChatPromptTemplate
 from langchain_openai import AzureChatOpenAI
 
 # --- Azure OpenAI Configuration ---
@@ -19,12 +17,3 @@ llm = AzureChatOpenAI(
     deployment_name=AZURE_OPENAI_MODEL_NAME,
     temperature=0.1
 )
-
-prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", "You are a helpful assistant that answers questions about a book."),
-        ("user", "{question}"),
-    ]
-)
-
-chain = prompt | llm | StrOutputParser()
