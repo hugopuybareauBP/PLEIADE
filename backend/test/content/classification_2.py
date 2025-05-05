@@ -19,7 +19,7 @@ client = AzureOpenAI(
     api_version=api_version,
 )
 
-def build_primary_thema_code(synopsis):
+def build_1st_letter(synopsis):
     prompt = (
         f"Your task is to assign the correct primary Thema code (only the first letter) to the following book, based on its synopsis.\n\n"
         f"Choose ONE of the following Thema codes:\n"
@@ -55,7 +55,7 @@ def build_primary_thema_code(synopsis):
                 {"role": "user", "content": prompt}
             ],
             temperature=0.1,
-            max_tokens=4096
+            max_tokens=10
         )
 
     return response.choices[0].message.content
@@ -64,19 +64,19 @@ def build_primary_thema_code(synopsis):
 #     match = re.match(r'\b([A-Z]{1,2})\b', raw_output.strip())
 #     return match.group(1) if match else None
 
-def get_secondary_thema_code_prompt(primary_thema_code):
+def get_2nd_letter_prompt(first_letter):
     file_path = "backend/test/content/dumps/secondary_thema_prompts.json"
     try:
         with open(file_path, "r") as f:
             prompts = json.load(f)
-        return prompts.get(primary_thema_code.strip().upper(), f"No prompt found for code '{primary_thema_code}'")
+        return prompts.get(first_letter.strip().upper(), f"No prompt found for letter '{first_letter}'")
     except FileNotFoundError:
         return f"File '{file_path}' not found."
     except json.JSONDecodeError:
         return "Error reading JSON file. Please ensure it is properly formatted."
     
-def build_secondary_thema_code(synopsis, primary_thema_code):
-    prompt = get_secondary_thema_code_prompt(primary_thema_code)
+def build_2nd_letter(synopsis, first_letter):
+    prompt = get_2nd_letter_prompt(first_letter)
     prompt += synopsis
     response = client.chat.completions.create(
         model=AZURE_OPENAI_MODEL_NAME,
@@ -84,29 +84,57 @@ def build_secondary_thema_code(synopsis, primary_thema_code):
             {"role": "user", "content": prompt}
         ],
         temperature=0.1,
-        max_tokens=4096
+        max_tokens=10
     )
 
     return response.choices[0].message.content
      
+def get_3rd_letter_prompt(second_letter):
+
+    file_path = "backend/test/content/dumps/3rd_letter_thema_prompts.json"
+    try:
+        with open(file_path, "r") as f:
+            prompts = json.load(f)
+        return prompts.get(second_letter.strip().upper(), f"No prompt found for 2nd letter '{second_letter}'")
+    except FileNotFoundError:
+        return f"File '{file_path}' not found."
+    except json.JSONDecodeError:
+        return "Error reading JSON file. Please ensure it is properly formatted."
+    
+def build_3rd_letter(synopsis, second_letter):
+    prompt = get_3rd_letter_prompt(second_letter)
+    prompt += synopsis
+    print(f"Prompt for 3rd letter: {prompt}")
+    response = client.chat.completions.create(
+        model=AZURE_OPENAI_MODEL_NAME,
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.1,
+        max_tokens=10
+    )
+
+    return response.choices[0].message.content
+
 if __name__ == "__main__":
     with open("backend/test/content/dumps/synopsis_echoes_2.json", "r") as f:
         data = json.load(f)
     synopsis = data["synopsis"]
 
-    # with open("backend/test/summarization/summaries/alice_vivid_prompt_2.json", "r") as f:
-    #         data = json.load(f)
-    #         summaries = [summary["raw_output"] for summary in data["summary"]]
-
     start = time.time()
-    print(f"Generating suggestion for primary Thema code...")
-    primary_thema_code = build_primary_thema_code(synopsis)
-    print(f"{primary_thema_code}")
-    print(f"Execution time for primary thema code: {time.time() - start:.2f} seconds")
+    print(f"Generating suggestion for first letter of thema code...")
+    first_letter = build_1st_letter(synopsis)
+    print(f"{first_letter}")
+    print(f"Execution time for first letter: {time.time() - start:.2f} seconds")
     start = time.time()
-    print(f"Generating suggestion for secondary Thema code...")
-    secondary_thema_code = build_secondary_thema_code(synopsis, primary_thema_code)
-    print(f"{secondary_thema_code}")
+    print(f"Generating suggestion for 2nd letter of thema code...")
+    second_letter = build_2nd_letter(synopsis, first_letter)
+    print(f"{second_letter}")
+    print(f"Execution time for secondary thema code: {time.time() - start:.2f} seconds")
+    start = time.time()
+    print(f"Generating suggestion for 3rd letter of thema code...")
+    third_letter = build_3rd_letter(synopsis, second_letter)
+    print(f"{third_letter}")
     print(f"Execution time for secondary thema code: {time.time() - start:.2f} seconds")
 
 
