@@ -29,7 +29,7 @@ def _load_chapter_summaries(book_id: str) -> List[Document]:
         data = json.load(f)
     chapters = data.get("analysis", {}).get("chapters", [])
     return [
-        Document(page_content=f"{c["chapter_name"]}: {c["raw_output"]}")
+        Document(page_content=f"{c['chapter_name']}: {c['raw_output']}")
         for c in chapters
         if "chapter_name" in c and "raw_output" in c
     ]

@@ -1,7 +1,11 @@
+# backend/app/routers/upload.py
+
 import datetime
 import secrets
 import tiktoken
 import pdfplumber
+import nltk
+nltk.download("punkt_tab")
 
 from fastapi import APIRouter, UploadFile, HTTPException
 from fastapi import File, Form

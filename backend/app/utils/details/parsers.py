@@ -7,7 +7,7 @@ from typing import List
 
 ### GENERAL PARSERS ###
 
-def parse_model_json_response(raw_output: str) -> dict | None:
+def parse_model_json_response(raw_output: str):
     # Remove common markdown formatting (```json, etc.)
     cleaned = re.sub(r"^```(?:json|python)?|```$", "", raw_output.strip(), flags=re.IGNORECASE | re.MULTILINE).strip()
 
