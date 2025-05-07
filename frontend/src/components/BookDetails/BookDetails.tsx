@@ -3,6 +3,7 @@ import AnalysisTab from './AnalysisTab';
 import MarketingTab from './MarketingTab';
 import ChatTab from './ChatTab';
 import DashboardTab from './DashboardTab';
+import CoverAnalysisTab from './CoverAnalysisTab';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -11,6 +12,7 @@ import {
     BarChart2,
     Share2,
     MessageSquare,
+    ImageIcon,
     Loader2
 } from 'lucide-react';
 
@@ -32,6 +34,7 @@ const tabs = [
     { id: 'marketing', label: 'Marketing', icon: Share2 },
     { id: 'chat', label: 'AI Chat', icon: MessageSquare },
     { id: 'dashboard', label: 'Dashboard', icon: BarChart2 },
+    { id: 'cover', label: 'Cover Analysis', icon: ImageIcon }
 ];
 
 const BookDetails = ({ book, onBack }: BookDetailsProps) => {
@@ -57,6 +60,7 @@ const BookDetails = ({ book, onBack }: BookDetailsProps) => {
             case 'overview': return <OverviewTab bookId={book.id} />;
             case 'analysis': return <AnalysisTab bookId={book.id} />;
             case 'marketing': return <MarketingTab bookId={book.id} />;
+            case 'cover': return <CoverAnalysisTab bookId={book.id} cover={book.cover} />;
             case 'chat': return <ChatTab bookId={book.id} />;
             case 'dashboard': return <DashboardTab bookId={book.id} />;
             default:
