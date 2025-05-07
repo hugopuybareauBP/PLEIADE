@@ -136,4 +136,29 @@ def get_thema_code_desc(code_value):
             return code_entry.get("CodeDescription")
     return None
 
+def load_main_genre(book_id: str) -> str:
+    path = STORAGE_PATH / f"book_{book_id}.json"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Book file not found")
 
+    with open(path, "r", encoding="utf-8") as f:
+        book_data = json.load(f)
+
+    try:
+        genres_str = book_data["overview"]["contentAnalysis"]["genres"]
+        genres = [g.strip() for g in genres_str.split(",")]
+        return genres[0] if genres else "Unknown"
+    except KeyError:
+        raise HTTPException(status_code=422, detail="Genre information not found in book file")
+
+# DASHBOARD METHODS
+
+def save_scores_as_json(audience_scores: dict, dir_path: Path, filename: str, ):
+    """Save the audience scores dictionary as a JSON file."""
+    dir_path.mkdir(parents=True, exist_ok=True)
+    output_path = dir_path / filename
+
+    with open(output_path, "w") as f:
+        json.dump(audience_scores, f, indent=4)
+
+    print(f"[SPIDER CHART GENERATOR] Saved audience scores at: {output_path}")
