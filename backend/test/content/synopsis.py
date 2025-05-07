@@ -4,7 +4,7 @@ import json
 import time
 import os 
 
-from ollama import chat
+# from ollama import chat
 from rich.console import Console
 from rich.panel import Panel
 

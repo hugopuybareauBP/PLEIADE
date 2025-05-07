@@ -1,7 +1,6 @@
 # backend/test/content/extract_characters.py
 
 import time
-import json
 import re 
 import spacy
 

@@ -4,7 +4,7 @@ import time
 import json
 import re
 
-from ollama import chat
+# from ollama import chat
 
 def build_primary_thema_code(synopsis):
     prompt = (

@@ -4,7 +4,7 @@ import json
 import time
 import re
 
-from ollama import chat 
+# from ollama import chat 
 
 def build_time_period(synopsis, summaries):
     print(f"[BUILD_TIME_PERIOD] Building time period...")

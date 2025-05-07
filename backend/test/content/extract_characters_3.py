@@ -5,7 +5,7 @@ import json
 import re
 import torch
 
-from ollama import chat
+# from ollama import chat
 from typing import List
 from sentence_transformers import SentenceTransformer, util
 
