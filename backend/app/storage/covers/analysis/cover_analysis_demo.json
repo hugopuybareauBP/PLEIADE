@@ -1,0 +1,26 @@
+[
+  {
+    "category": "Title & Theme",
+    "title": "PROJECT ECHO",
+    "description": "The bold title suggests a narrative centered around technology and possibly a scientific or experimental theme, hinting at a story that explores the implications of innovation and discovery.",
+    "icon": "\ud83e\udde0"
+  },
+  {
+    "category": "Character Representation",
+    "title": "Cool Tale",
+    "description": "The presence of characters in medical attire implies a connection to healthcare or science, suggesting that the story may involve personal journeys intertwined with professional challenges.",
+    "icon": "\u2764\ufe0f"
+  },
+  {
+    "category": "Visual Aesthetics",
+    "title": "Dark Background with Circuit Patterns",
+    "description": "The dark, tech-inspired background creates a sense of mystery and intrigue, enhancing the futuristic and possibly dystopian atmosphere of the narrative.",
+    "icon": "\ud83d\udd25"
+  },
+  {
+    "category": "Collaborative Element",
+    "title": "BLUES & AMANDA",
+    "description": "The inclusion of names suggests a collaborative effort, indicating that the narrative may explore themes of partnership, teamwork, or shared experiences in the face of challenges.",
+    "icon": "\ud83e\udd1d"
+  }
+]

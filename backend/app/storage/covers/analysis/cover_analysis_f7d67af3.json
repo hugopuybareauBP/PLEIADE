@@ -1,0 +1,26 @@
+[
+  {
+    "category": "Hero Story",
+    "title": "ALICE",
+    "description": "The central figure of the cover, Alice, represents curiosity and adventure, embodying the spirit of exploration that defines her journey in Wonderland. Her iconic blue dress and white apron are instantly recognizable, symbolizing innocence and the transition from childhood to a fantastical world.",
+    "icon": "\ud83e\uddda"
+  },
+  {
+    "category": "Whimsical Elements",
+    "title": "Cheshire Cat",
+    "description": "The Cheshire Cat, perched in the tree, adds a layer of mystery and playfulness to the cover. Its mischievous grin and surreal presence reflect the unpredictable nature of Wonderland, inviting readers into a world where logic is turned upside down.",
+    "icon": "\ud83d\ude38"
+  },
+  {
+    "category": "Supporting Characters",
+    "title": "White Rabbit",
+    "description": "The White Rabbit, with his pocket watch, symbolizes the theme of time and urgency that permeates the story. His anxious demeanor and the classic attire contribute to the whimsical yet slightly chaotic atmosphere of Wonderland.",
+    "icon": "\ud83d\udc07"
+  },
+  {
+    "category": "Visual Aesthetic",
+    "title": "Color Palette",
+    "description": "The rich, muted colors of the cover create a nostalgic and enchanting feel, reminiscent of classic storybooks. The green background and earthy tones enhance the magical forest setting, drawing readers into the whimsical world of Alice.",
+    "icon": "\ud83c\udf33"
+  }
+]

@@ -1,57 +1,4 @@
 {
-    "marketing": {
-        "ecommerce": {
-            "description": [
-                "What happens when your greatest creation becomes your worst nightmare? Dive into the thrilling world of Project Echo, where reality blurs and survival hinges on the power of the mind.",
-                "Dr. Evelyn Porter, her assistant Anya, and the enigmatic Adrian find themselves ensnared in a digital prison of their own making. As they traverse a surreal landscape filled with haunting memories and emotional turmoil, they must unravel the mystery of their entrapment. With external forces threatening to erase their existence, Evelyn must unite their consciousness to send a desperate signal for salvation before time runs out."
-            ],
-            "bullets": [
-                "Experience a gripping tale of survival in a mind-bending digital realm.",
-                "Explore the depths of memory and emotion as characters confront their pasts.",
-                "Join a race against time to uncover the truth and escape the void."
-            ],
-            "closing": "Don't miss your chance to embark on this exhilarating journey—grab your copy of Project Echo today and discover the power of the human spirit in the face of unimaginable odds!"
-        },
-        "social": {
-            "twitter": [
-                {
-                    "content": "🚀 Trapped in a digital maze, Dr. Evelyn Porter & her crew must unravel their memories to escape a high-stakes simulation gone wrong! Can they send a signal for salvation before they vanish into the void? 🌌 Dive into a mind-bending adventure! #ProjectEcho #FictionThriller #LostInTheVoid",
-                    "metrics": {
-                        "likes": 93,
-                        "retweets": 87
-                    }
-                },
-                {
-                    "content": "🚨 Trapped in a digital maze with only memories and a mysterious stranger to guide them, Dr. Evelyn Porter and her team must race against time to escape! Can they break free from their own creation before it's too late? 🔍💥 Dive into the chaos of *Project Echo*! #Thriller #SciFi #MustRead",
-                    "metrics": {
-                        "likes": 1,
-                        "retweets": 53
-                    }
-                }
-            ],
-            "instagram": [
-                {
-                    "image": "",
-                    "content": "to generate",
-                    "metrics": {
-                        "likes": 48,
-                        "comments": 50
-                    }
-                }
-            ],
-            "tiktok": [
-                {
-                    "thumbnail": "to generate",
-                    "caption": "to generate",
-                    "metrics": {
-                        "views": "",
-                        "likes": ""
-                    }
-                }
-            ]
-        },
-        "visuals": []
-    },
     "analysis": {
         "impact": {
             "strengths": [
@@ -248,5 +195,92 @@
                 "note": "A young woman from a secluded community embarks on a journey through space, confronting her identity and memories while navigating a universe filled with conflict and the unknown."
             }
         ]
+    },
+    "marketing": {
+        "ecommerce": {
+            "description": [
+                "What happens when your greatest creation becomes your worst nightmare? Dive into the mind-bending world of Project Echo, where reality blurs and survival hinges on confronting the past.",
+                "Dr. Evelyn Porter, a brilliant scientist, finds herself trapped in the very simulation she designed, alongside the enigmatic Adrian. As they traverse a surreal landscape shaped by their own consciousness, they must unravel a sinister force that threatens to ensnare them—and countless others. With time slipping away, Evelyn faces her deepest fears and a heart-wrenching choice that could determine their fate and the fate of reality itself."
+            ],
+            "bullets": [
+                "Experience a thrilling blend of science fiction and psychological drama.",
+                "Join Evelyn and Adrian on a gripping journey through a digital landscape filled with danger and intrigue.",
+                "Explore themes of memory, identity, and the consequences of unchecked ambition."
+            ],
+            "closing": "Don't miss your chance to unravel the mysteries of Project Echo—grab your copy today and embark on an unforgettable adventure!"
+        },
+        "social": {
+            "twitter": [
+                {
+                    "content": "🚨 Trapped in her own mind! Dr. Evelyn Porter and her enigmatic ally, Adrian, must unravel a twisted reality before a dark force pulls them under. Can she confront her past and break free from Project Echo? Time’s ticking! ⏳✨ #ProjectEcho #Thriller #MindBendingAdventure",
+                    "metrics": {
+                        "likes": 78,
+                        "retweets": 52
+                    }
+                },
+                {
+                    "content": "🌌 Trapped in her own creation, Dr. Evelyn Porter must navigate a mind-bending simulation with a mysterious ally, Adrian. Can they escape the sinister force lurking in the shadows before it’s too late? Dive into a digital nightmare with \"Project Echo\"! 🚀 #SciFiThriller #MindGames #BookLovers",
+                    "metrics": {
+                        "likes": 6,
+                        "retweets": 82
+                    }
+                }
+            ],
+            "instagram": [
+                {
+                    "image": "",
+                    "content": "to generate",
+                    "metrics": {
+                        "likes": 71,
+                        "comments": 90
+                    }
+                }
+            ],
+            "tiktok": [
+                {
+                    "title": "Trapped in a Simulation!",
+                    "duration_seconds": 15,
+                    "segments": [
+                        {
+                            "start": 0,
+                            "end": 3,
+                            "narration": "What if you were stuck in your own creation?",
+                            "visuals": "Quick flashes of a glitchy digital landscape and a panicked Dr. Evelyn.",
+                            "sound": "Intense electronic music begins to build tension."
+                        },
+                        {
+                            "start": 3,
+                            "end": 6,
+                            "narration": "Evelyn and Adrian must escape a sinister force!",
+                            "visuals": "Cut to Evelyn and Adrian running through shifting, colorful landscapes.",
+                            "sound": "Heartbeat sound effect increasing in tempo."
+                        },
+                        {
+                            "start": 6,
+                            "end": 9,
+                            "narration": "Can they confront their deepest fears?",
+                            "visuals": "Close-ups of Evelyn's face showing determination and fear.",
+                            "sound": "Crescendo in the music, building suspense."
+                        },
+                        {
+                            "start": 9,
+                            "end": 12,
+                            "narration": "Time is running out!",
+                            "visuals": "Clock ticking rapidly, with flashes of dark shadows approaching.",
+                            "sound": "Ticking clock sound layered over the music."
+                        },
+                        {
+                            "start": 12,
+                            "end": 15,
+                            "narration": "Will they reclaim their reality?",
+                            "visuals": "Dramatic pause with a cliffhanger shot of the digital prison's gate.",
+                            "sound": "Music cuts out for a brief moment, then a dramatic swell."
+                        }
+                    ],
+                    "call_to_action": "Find out what happens next!"
+                }
+            ]
+        },
+        "visuals": []
     }
 }
