@@ -7,10 +7,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from backend.app.routers import upload # UploadPage
-from backend.app.routers import book_details # BookDetailsPage
-from backend.app.routers import chatbot # ChatStreamPage
-from backend.app.routers import dashboard # DashboardPage
+from backend.app.routers import (
+    upload,
+    book_details,
+    chatbot,
+    dashboard,
+    cover_analysis
+)
 
 app = FastAPI(
     title="My Book Analyzer",
@@ -39,6 +42,7 @@ app.include_router(upload.router)
 app.include_router(book_details.router)
 app.include_router(chatbot.router)
 app.include_router(dashboard.router)
+app.include_router(cover_analysis.router)
 
 if __name__ == "__main__":
     uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)
