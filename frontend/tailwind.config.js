@@ -5,6 +5,7 @@ export default {
         extend: {
             animation: {
                 fadeIn: "fadeIn 1.2s ease-out forwards",
+                fadeInStagger: "fadeIn 0.8s ease-out forwards",
                 pulseSlow: "pulseSlow 2s ease-in-out infinite",
             },
             keyframes: {
