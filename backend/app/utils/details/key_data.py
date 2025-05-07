@@ -1,9 +1,9 @@
-# backend/app/utils/key_data.py
+# backend/app/utils/details/key_data.py
 
 import spacy
-import math
 
 nlp = spacy.load("en_core_web_sm")
+nlp.max_length = 10_000_000
 
 def build_key_data(text: str, chapter_breakdown, pages) -> dict:
     # Key data 
