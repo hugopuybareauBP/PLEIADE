@@ -21,7 +21,33 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
     const streamedAnswerRef = useRef<string>('');
     const hasEnded = useRef(false);
 
-    // 1) On mount (or when bookId changes), load existing chat history
+    const queueRef = useRef<string[]>([]);
+    const intervalRef = useRef<number | null>(null);
+
+    const startStreaming = () => {
+        if (intervalRef.current) return;
+
+        console.log('[⏳] startStreaming...');
+        intervalRef.current = window.setInterval(() => {
+            if (queueRef.current.length === 0) return;
+
+            const nextChar = queueRef.current.shift();
+            if (nextChar !== undefined) {
+                streamedAnswerRef.current += nextChar;
+                setCurrentAnswer(streamedAnswerRef.current);
+                // console.log('[➡️] Char:', nextChar);
+            }
+        }, 10);
+    };
+
+    const stopStreaming = () => {
+        if (intervalRef.current) {
+            console.log('[🛑] stopStreaming...');
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
+    };
+
     useEffect(() => {
         const loadHistory = async () => {
             try {
@@ -32,7 +58,6 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
                     history: { role: string; content: string }[];
                 };
 
-                // pair up user → assistant messages
                 const pairs: QA[] = [];
                 for (let i = 0; i < raw.length; i++) {
                     if (
@@ -41,10 +66,11 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
                         raw[i + 1].role === 'assistant'
                     ) {
                         pairs.push({ q: raw[i].content, a: raw[i + 1].content });
-                        i++; // skip the assistant we just consumed
+                        i++;
                     }
                 }
 
+                console.log('[📜] Loaded history:', pairs);
                 setHistory(pairs);
             } catch (err) {
                 console.error('Error loading chat history', err);
@@ -54,7 +80,6 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
         loadHistory();
     }, [bookId]);
 
-    // NEW: clear history handler
     const handleClearHistory = async () => {
         if (loading) return;
         try {
@@ -66,6 +91,7 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
             setHistory([]);
             streamedAnswerRef.current = '';
             setCurrentAnswer(null);
+            console.log('[🗑️] History cleared');
         } catch (err) {
             console.error('Error clearing history', err);
         }
@@ -74,20 +100,22 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
     const finalize = () => {
         if (hasEnded.current) return;
         hasEnded.current = true;
+        stopStreaming();
 
-        setHistory((prev) => [
-            ...prev,
-            { q: question, a: streamedAnswerRef.current },
-        ]);
-        setCurrentAnswer(streamedAnswerRef.current);
+        const finalAnswer = streamedAnswerRef.current;
+        console.log('[✅] Finalizing answer:', finalAnswer);
+
+        setHistory((prev) => [...prev, { q: question, a: finalAnswer }]);
+        setCurrentAnswer(finalAnswer);
 
         setTimeout(() => {
             setCurrentAnswer(null);
+            streamedAnswerRef.current = '';
+            console.log('[♻️] Cleared streamed buffer and UI');
         }, 100);
 
         setQuestion('');
         setLoading(false);
-        streamedAnswerRef.current = '';
     };
 
     const handleAsk = () => {
@@ -97,6 +125,9 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
         setLoading(true);
         setCurrentAnswer('');
         streamedAnswerRef.current = '';
+        queueRef.current = [];
+
+        console.log('[🧠] New question:', question);
 
         const source = new EventSource(
             `${import.meta.env.VITE_API_URL}/chat/stream?question=${encodeURIComponent(
@@ -105,23 +136,35 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
         );
 
         source.onmessage = (event) => {
-            streamedAnswerRef.current += event.data;
-            setCurrentAnswer(streamedAnswerRef.current);
+            // console.log('[📨] Received chunk:', event.data);
+            queueRef.current.push(...event.data);
+            startStreaming();
         };
 
         source.addEventListener('done', () => {
+            console.log('[✅] Event: done');
             source.close();
-            finalize();
+        
+            const waitForDrain = setInterval(() => {
+                if (queueRef.current.length === 0) {
+                    clearInterval(waitForDrain);
+                    console.log('[🧹] Queue drained after done → finalizing');
+                    finalize();
+                } else {
+                    console.log('[⌛] Waiting for queue to drain...', queueRef.current.length);
+                }
+            }, 500); 
         });
 
-        source.onerror = () => {
+        source.onerror = (e) => {
+            console.log('[❌] Event: error', e);
             source.close();
             finalize();
         };
 
-        // safety timeout
         setTimeout(() => {
             if (!hasEnded.current) {
+                console.log('[⏰] Timeout triggered');
                 source.close();
                 finalize();
             }
@@ -134,7 +177,6 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
         }
     };
 
-    // scroll as new messages come in
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [currentAnswer, history]);
@@ -188,7 +230,6 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
                     </p>
                 ) : (
                     <>
-                        {/* render loaded history */}
                         {history.map((item, idx) => (
                             <div key={idx} className="space-y-4">
                                 <div className="flex justify-end items-start space-x-2">
@@ -211,7 +252,6 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
                             </div>
                         ))}
 
-                        {/* streaming new answer */}
                         {currentAnswer && (
                             <div className="space-y-4">
                                 <div className="flex justify-end items-start space-x-2">
@@ -228,17 +268,22 @@ const ChatTab = ({ bookId }: ChatTabProps) => {
                                     </div>
                                     <div className="max-w-lg bg-white/10 text-white/80 rounded-xl px-4 py-2 whitespace-pre-line">
                                         {currentAnswer}
+                                        <span className="animate-pulse text-white/50">|</span>
                                     </div>
                                 </div>
                             </div>
                         )}
 
                         {loading && !currentAnswer && (
-                            <div className="flex items-center text-white/50 text-sm italic space-x-2">
-                                <span>Thinking</span>
-                                <span className="animate-pulse">.</span>
-                                <span className="animate-pulse delay-100">.</span>
-                                <span className="animate-pulse delay-200">.</span>
+                            <div className="flex justify-start items-start space-x-2">
+                                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white text-sm">
+                                    🤖
+                                </div>
+                                <div className="max-w-lg bg-white/10 text-white/80 rounded-xl px-4 py-2">
+                                    <span className="inline-block animate-bounce">.</span>
+                                    <span className="inline-block animate-bounce delay-150">.</span>
+                                    <span className="inline-block animate-bounce delay-300">.</span>
+                                </div>
                             </div>
                         )}
 
