@@ -159,6 +159,44 @@ def build_tweet(synopsis: str) -> str:
             """
     return call_llm("You are a social media content writer for a publishing house.", prompt, temperature=0.6)
 
+def build_tiktok_script(synopsis: str) -> str:
+    prompt = f"""
+        Based on the following book synopsis, generate a TikTok video scenario lasting exactly 15 seconds.
+
+        Synopsis:
+        {synopsis}
+
+        Return the scenario as a valid JSON object with the following structure:
+
+        {{
+            "title": "A short, engaging title for the video",
+            "duration_seconds": 15,
+            "segments": [
+                {{
+                    "start": 0,
+                    "end": 3,
+                    "narration": "Voiceover or text on screen",
+                    "visuals": "What is shown on screen",
+                    "sound": "Music or sound effect suggestion"
+                }},
+                {{
+                    "start": 3,
+                    "end": 6,
+                    ...
+                }}
+                ...
+            ],
+            "call_to_action": "A final hook or CTA like 'Read to find out more!'"
+        }}
+
+        The tone should be fast-paced, modern, and BookTok-friendly.
+        Prioritize grabbing attention in the first 3 seconds. 
+        Don't mention AI or that this is based on a summary.
+        Make sure your response is a valid JSON string, properly formatted.
+    """
+    return call_llm("You are a TikTok content writer for viral BookTok videos.", prompt, temperature=0.7)
+
+
 ### OVERVIEW & META ###
 
 def build_synopsis(chapter_breakdown, title: str) -> str:
@@ -199,6 +237,17 @@ def build_genres(synopsis, chapter_breakdown):
     prompt = f"""
             Based on the synopsis and chapters below, identify the genres of the book (e.g., 'Science Fiction', 'Romance', 'Historical Fiction').
             **Just give 3 genres, separated by commas. e.g ("Technology, Business, Future Studies"). Do not make a sentence.**
+            The first genre should be extracted from this list: 
+                - Novel or Short Story: Fictional prose, the book is short, focusing on plot and character development.\n
+                - Poetry: Literary work focused on the expression of feelings and ideas through rhythm, style, and metaphorical language.\n
+                - Drama: A work intended for performance on stage, focusing on dialogue and action.\n
+                - Essay: A short nonfiction text presenting an argument or personal reflection on a specific topic.\n
+                - Autobiography / Memoir: A personal narrative written by the subject, recounting their own life or experiences.\n
+                - Biography: A factual, third-person account of someone's life written by someone else.\n
+                - Crime / Detective Fiction: Stories centered on solving a crime or mystery, often involving a detective or investigator.\n
+                - Science Fiction: Speculative fiction involving futuristic science, technology, space, or other scientific elements.\n
+                - Fantasy: Fiction set in imaginary worlds, often involving magic, mythical creatures, or supernatural events.\n
+                - Historical Fiction: Fictional stories set in the past, often featuring real historical events or figures.\n\n
 
             Synopsis:
             {synopsis}

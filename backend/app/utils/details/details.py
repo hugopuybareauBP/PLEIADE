@@ -12,7 +12,7 @@ from backend.app.utils.details.llm import build_impact_analysis, build_chapter_b
 from backend.app.utils.details.profile_generation import profile_generation_pipeline
 from backend.app.utils.details.location_generation import location_note_pipeline
 # Marketing imports
-from backend.app.utils.details.llm import build_ecommerce_description, build_tweet
+from backend.app.utils.details.llm import build_ecommerce_description, build_tweet, build_tiktok_script
 from backend.app.utils.details.parsers import parse_ecommerce
 # Global imports
 from backend.app.utils.details.parsers import parse_model_json_response
@@ -102,16 +102,7 @@ def generate_marketing_components(book_id):
                     }
                 }
             ],
-            "tiktok": [
-                {
-                    "thumbnail" : "to generate",
-                    "caption" : "to generate",
-                    "metrics": {
-                        "views": "",
-                        "likes": ""
-                    }
-                }
-            ]
+            "tiktok": [parse_model_json_response(build_tiktok_script(synopsis))],
         },
         "visuals": []
     }
