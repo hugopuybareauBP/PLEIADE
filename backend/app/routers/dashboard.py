@@ -7,8 +7,8 @@ from pathlib import Path
 
 from backend.app.utils.dashboard.target_reader import target_reader_chart_pipeline
 from backend.app.utils.dashboard.genres import genres_chart_pipeline
-from backend.app.utils.dashboard.style_dna import style_dna_pipeline
-from backend.app.storage.storage import load_main_genre  # <- make sure this exists
+from backend.app.utils.dashboard.style_dna import style_dna_pipeline_chunks, style_dna_pipeline_fulltext
+from backend.app.storage.storage import load_main_genre
 
 router = APIRouter()
 
@@ -45,7 +45,7 @@ async def get_or_generate_spider_charts(book_id: str):
         print(f"[DASHBOARD] Style DNA chart for book_id={book_id} not found. Generating...")
         try:
             genre = load_main_genre(book_id)
-            style_dna_pipeline(book_id, genre)
+            style_dna_pipeline_chunks(book_id, genre)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Error generating style DNA chart: {str(e)}")
 
