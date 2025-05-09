@@ -42,8 +42,8 @@ def marketing_retriever(book_id: str, question: str) -> List[Document]:
     for comparison in overview.get("comparison", []):
         title = comparison.get("title", "Unknown Title")
         author = comparison.get("author", "Unknown Author")
-        note = comparison.get("note", "")
-        content = f"{title} by {author} — {note}"
+        # note = comparison.get("note", "")
+        content = f"{title} by {author}"
         content_blocks.append((f"Comparison: {title}", content))
 
     docs = [Document(page_content=f"{title}: {content}") for title, content in content_blocks]
