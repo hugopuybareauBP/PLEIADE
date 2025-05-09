@@ -1,32 +1,27 @@
 [
     {
-        "author": "Philip K. Dick",
-        "score": 29,
-        "justification": "The text explores themes of consciousness, reality, and identity, reminiscent of Dick's focus on the nature of reality and the human mind. The narrative's psychological depth and the concept of simulated realities echo his signature style."
-    },
-    {
         "author": "Isaac Asimov",
-        "score": 23,
-        "justification": "Asimov's influence is evident in the scientific rigor and ethical dilemmas presented in the story, particularly regarding the implications of consciousness uploading and artificial intelligence. The structured approach to scientific exploration aligns with Asimov's narrative style."
+        "score": 30,
+        "justification": "The text reflects Asimov's influence through its exploration of complex scientific concepts and ethical dilemmas, particularly regarding artificial intelligence and consciousness. The narrative's focus on logical reasoning and the implications of technological advancements aligns with Asimov's hallmark themes."
     },
     {
         "author": "Arthur C. Clarke",
-        "score": 18,
-        "justification": "Clarke's work often blends advanced technology with philosophical questions, much like the text's exploration of consciousness and the implications of digital existence. The atmosphere of wonder and the unknown reflects Clarke's thematic concerns."
+        "score": 25,
+        "justification": "Clarke's influence is evident in the text's atmospheric descriptions and the sense of wonder surrounding advanced technology and its potential. The narrative's blend of scientific realism with speculative elements mirrors Clarke's style, particularly in how it portrays the unknown and the exploration of human consciousness."
+    },
+    {
+        "author": "Philip K. Dick",
+        "score": 20,
+        "justification": "The text embodies Dick's themes of reality, identity, and the nature of consciousness, particularly through the protagonist's experiences within a simulated environment. The psychological depth and existential questions posed resonate with Dick's characteristic exploration of altered states of reality."
     },
     {
         "author": "Ursula K. Le Guin",
-        "score": 14,
-        "justification": "Le Guin's influence is seen in the text's exploration of identity and the human experience within a speculative framework. The character-driven narrative and focus on interpersonal relationships amidst a sci-fi backdrop resonate with her style."
-    },
-    {
-        "author": "Ray Bradbury",
-        "score": 9,
-        "justification": "Bradbury's lyrical prose and emphasis on the emotional aspects of technology can be felt in the text's vivid descriptions and the protagonist's internal struggles. The blend of human experience with speculative elements reflects his influence."
+        "score": 15,
+        "justification": "Le Guin's influence is seen in the text's introspective character development and the exploration of social and ethical implications of technology. The narrative's focus on human relationships and emotional depth reflects Le Guin's ability to weave complex themes into her science fiction."
     },
     {
         "author": "H. G. Wells",
-        "score": 8,
-        "justification": "Wells' pioneering ideas about time travel and alternate realities resonate in the text's exploration of simulated environments and the consequences of scientific experimentation. The narrative's adventurous spirit is reminiscent of Wells' storytelling."
+        "score": 10,
+        "justification": "Wells' impact is present in the text's adventurous spirit and the underlying commentary on societal issues through speculative technology. The narrative's tension and conflict echo Wells' style of using science fiction as a lens to critique contemporary society."
     }
 ]

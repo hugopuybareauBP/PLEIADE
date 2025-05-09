@@ -1,32 +1,32 @@
 [
     {
+        "author": "Lewis Carroll",
+        "score": 40,
+        "justification": "The whimsical and nonsensical elements of the text, along with the playful dialogue and absurd situations, reflect Carroll's unique style, which blends fantasy with a childlike perspective."
+    },
+    {
+        "author": "J. R. R. Tolkien",
+        "score": 20,
+        "justification": "Tolkien's influence is evident in the richly imaginative world-building and the presence of fantastical creatures, which create an immersive atmosphere reminiscent of his epic narratives."
+    },
+    {
         "author": "C. S. Lewis",
-        "score": 29,
-        "justification": "Lewis's influence is evident in the whimsical and imaginative elements of the text, as well as the exploration of identity and morality, which are central themes in both his works and Carroll's."
+        "score": 15,
+        "justification": "Lewis's style is reflected in the moral undertones and the exploration of identity and transformation, themes that resonate with Alice's journey through a fantastical landscape."
     },
     {
         "author": "Terry Pratchett",
-        "score": 21,
-        "justification": "Pratchett's humorous and satirical tone resonates in the playful absurdity of the narrative, reflecting a similar style of blending fantasy with wit and social commentary."
+        "score": 10,
+        "justification": "Pratchett's humor and satirical approach to fantasy are mirrored in the text's playful tone and absurd character interactions, which challenge conventional logic."
     },
     {
         "author": "Neil Gaiman",
-        "score": 18,
-        "justification": "Gaiman's style of merging the fantastical with the mundane is mirrored in Carroll's narrative, where ordinary experiences are transformed into extraordinary adventures."
-    },
-    {
-        "author": "Ursula K. Le Guin",
-        "score": 14,
-        "justification": "Le Guin's focus on philosophical themes and the exploration of different realities can be seen in the way Alice navigates her surreal environment, questioning her identity and existence."
+        "score": 5,
+        "justification": "Gaiman's influence can be seen in the blending of reality with the surreal, as well as the exploration of deeper themes beneath the whimsical surface, akin to Alice's introspective moments."
     },
     {
         "author": "Philip Pullman",
-        "score": 9,
-        "justification": "Pullman's intricate world-building and exploration of complex themes of knowledge and power echo in Carroll's layered narrative, where Alice's journey is both physical and intellectual."
-    },
-    {
-        "author": "J. K. Rowling",
-        "score": 6,
-        "justification": "Rowling's influence is subtle but present in the sense of wonder and the coming-of-age journey, as Alice's adventures reflect a child's growth and understanding of a fantastical world."
+        "score": 5,
+        "justification": "Pullman's narrative style, which often intertwines the fantastical with philosophical questions, resonates in Alice's contemplative dialogues and her quest for understanding."
     }
 ]
